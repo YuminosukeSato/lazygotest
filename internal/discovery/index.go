@@ -28,7 +28,7 @@ func ListPackages(ctx context.Context, patterns []string) ([]Package, error) {
 		return nil, err
 	}
 	dec := json.NewDecoder(bytes.NewReader(out))
-	var pkgs []Package
+	pkgs := make([]Package, 0, 10) // Pre-allocate with reasonable capacity
 	for dec.More() {
 		var p Package
 		if err := dec.Decode(&p); err != nil {
