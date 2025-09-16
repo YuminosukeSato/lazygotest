@@ -1,0 +1,130 @@
+version: "2"
+run:
+  go: "1.25"
+  allow-parallel-runners: true
+linters:
+  default: none
+  enable:
+    - errcheck
+    - gocyclo
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - prealloc
+    - staticcheck
+    - unparam
+    - unused
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+      exclude-functions:
+        - encoding/json.Marshal
+        - encoding/json.MarshalIndent
+    gocyclo:
+      min-complexity: 30
+    govet:
+      settings:
+        printf:
+          funcs:
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+            - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+    misspell:
+      locale: US
+    nakedret:
+      max-func-lines: 30
+    prealloc:
+      simple: true
+      range-loops: true
+      for-loops: true
+    staticcheck:
+      initialisms:
+        - ACL
+        - API
+        - ASCII
+        - CPU
+        - CSS
+        - DNS
+        - EOF
+        - GUID
+        - HTML
+        - HTTP
+        - HTTPS
+        - ID
+        - IP
+        - JSON
+        - QPS
+        - RAM
+        - RPC
+        - SLA
+        - SMTP
+        - SQL
+        - SSH
+        - TCP
+        - TLS
+        - TTL
+        - UDP
+        - UI
+        - GID
+        - UID
+        - UUID
+        - URI
+        - URL
+        - UTF8
+        - VM
+        - XML
+        - XMPP
+        - XSRF
+        - XSS
+        - SIP
+        - RTP
+        - AMQP
+        - DB
+        - TS
+    unparam:
+      check-exported: false
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - proto/
+      - .*/mock/.*
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/abema/vega)
+      custom-order: true
+    gofmt:
+      simplify: true
+    gofumpt:
+      module-path: github.com/abema/vega
+      extra-rules: true
+  exclusions:
+    generated: lax
+    paths:
+      - proto/
+      - .*/mock/.*
+      - third_party$
+      - builtin$
+      - examples$
