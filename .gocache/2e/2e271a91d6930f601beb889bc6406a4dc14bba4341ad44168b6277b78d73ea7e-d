@@ -1,5 +1,0 @@
-./console.go
-./console_unix.go
-./pty_unix.go
-./tc_darwin.go
-./tc_unix.go

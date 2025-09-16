@@ -1,0 +1,168 @@
+# ========================
+# Go Build & Binaries
+# ========================
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Project specific binary
+/lazytest
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+*.cover
+*.coverprofile
+coverage.*
+profile.cov
+
+# Go build cache
+/.gocache/
+
+# ========================
+# Dependencies
+# ========================
+# Dependency directories (uncomment if using vendor)
+# vendor/
+
+# Go workspace files
+go.work
+go.work.sum
+
+# ========================
+# Project Specific
+# ========================
+# Local configuration directories
+/.serena/
+/.claude/
+
+# ========================
+# Environment & Security
+# ========================
+# Environment variable files
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Security keys and certificates
+*.key
+*.pem
+*.crt
+*.cert
+*.p12
+
+# ========================
+# IDE & Editors
+# ========================
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# GoLand / IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+.*.swp
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ========================
+# OS Specific
+# ========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ========================
+# Debug & Logs
+# ========================
+# Log files
+*.log
+logs/
+*.log.*
+
+# Debug files
+*.prof
+*.mem
+*.pprof
+debug/
+debug.test
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.temp
+tmp/
+temp/
+
+# ========================
+# Documentation
+# ========================
+# Generated documentation
+/docs/_build/
+/docs/generated/
+
+# ========================
+# Other
+# ========================
+# Archives
+*.zip
+*.tar.gz
+*.tar
+*.gz
+*.rar
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Generated files
+*.generated.go
+*_gen.go
+
+# Build directories
+/dist/
+/build/
+/out/
+/target/
+/bin/
+
+# Package files
+*.deb
+*.rpm
+*.dmg
+*.pkg
+*.msi
