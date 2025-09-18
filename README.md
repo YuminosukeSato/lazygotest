@@ -104,23 +104,26 @@ Flags:
 ## UI Overview
 
 ```
-┌─ TESTS (j/k move, Space select, ? help) ────────────────────────────────────┐
+┌─ TESTS (j/k move, l expand, h collapse, Space select, ? help) ─────────────┐
 │  ↑ 0/128  [pkg] internal/foo                                               │
-│    ✓ TestAdd             3ms                                               │
-│    ✗ TestDivZero         2ms     want:4 got:5                             │
+│    ✓ TestAdd             3ms     ⌁ flaky:2%                                │
+│    ✗ TestDivZero         2ms     msg: want4 got5                           │
 │  ▸ internal/bar                                                            │
 │  ▸ internal/baz                                                            │
-│  filter: /Div|Add/   [failed][short]                                       │
+│  filter: /Div|Add/   chips: [failed][short]                                │
 └────────────────────────────────────────────────────────────────────────────┘
-┌─ FLAGS (g:-race c:cover b:bench) ──────────────────────────────────────────┐
+┌─ FLAGS (t tags g:-race c cover b bench z fuzz w watch o open-editor) ─────┐
 │  -run=^(TestDivZero|TestAdd)$   -tags=integration   -race=ON   -short=OFF  │
 └────────────────────────────────────────────────────────────────────────────┘
-┌─ LOGS (Enter focus, ↑↓ scroll) ────────────────────────────────────────────┐
-│ === TestDivZero · FAIL (2ms)                                              │
-│ --- want: 4                                                                │
-│ +++ got : 5                                                                │
+┌─ LOGS (Enter/Tab focus, ↑↓ scroll, s save, C-f search) ───────────────────┐
+│ === internal/foo · TestDivZero · FAIL (2ms)                               │
+│ --- want: 4                                                               │
+│ +++ got : 5                                                               │
+│ cmp.Diff: (-want +got)                                                    │
+│ -4                                                                        │
+│ +5                                                                        │
 └────────────────────────────────────────────────────────────────────────────┘
-STATUS: ● Running (3/12) | PASS:10 FAIL:2 | ⏱ 12.3s | R:rerun . repeat q:quit
+STATUS: ● Running pkg:foo (3/12) | PASS:10 FAIL:2 SKIP:0 | ⏱ 12.3s | R rerun failed  . repeat  q quit
 ```
 
 ## Architecture
