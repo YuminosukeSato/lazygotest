@@ -19,7 +19,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.23'
 
       - name: Check out code
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.22']
+        go-version: ['1.23']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out code
@@ -90,7 +90,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.22']
+        go-version: ['1.23']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Check out code
@@ -118,15 +118,15 @@ jobs:
         run: go mod download
 
       - name: Build binary
-        run: go build -v ./cmd/lazytest
+        run: go build -v ./cmd/gotui
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lazytest-${{ matrix.os }}-${{ matrix.go-version }}
+          name: gotui-${{ matrix.os }}-${{ matrix.go-version }}
           path: |
-            lazytest
-            lazytest.exe
+            gotui
+            gotui.exe
           retention-days: 7
           if-no-files-found: ignore
 
@@ -140,7 +140,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.23'
 
       - name: Download dependencies
         run: go mod download
