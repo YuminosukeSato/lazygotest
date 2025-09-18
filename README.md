@@ -1,46 +1,52 @@
 # gotui
 
-An interactive terminal-based Go test runner with a modern TUI (Terminal User Interface) built using Bubble Tea and Clean Architecture.
+A LazyGit-inspired TUI for running Go tests with an interactive, keyboard-driven interface.
 
 ## Features
 
-- **Interactive Test Selection**: Browse and select tests to run with keyboard navigation
-- **Real-time Test Results**: Watch test results as they stream in
-- **Failed Test Management**: Easily re-run only failed tests
-- **Powerful Filtering**: Filter tests by name or package
-- **Test Flags Support**: Toggle common test flags like `-race`, `-cover`, `-short`
-- **Multi-panel Interface**: Split view for tests, flags, and logs
-- **Keyboard-driven Workflow**: Efficient navigation without leaving the keyboard
+- **Interactive Test Selection**: Navigate and select tests using keyboard shortcuts
+- **Real-time Output**: Watch test results stream in as they run
+- **Failed Test Management**: Quickly re-run only failed tests
+- **Smart Filtering**: Filter tests by name or package
+- **Test Flags**: Toggle common flags like `-race`, `-cover`, `-short`
+- **Split View**: Dedicated panels for tests, flags, and logs
+- **Keyboard-driven**: Efficient workflow without leaving the keyboard
 
 ## Installation
 
-### Using go install
+### Homebrew (macOS/Linux)
 
 ```bash
-go install github.com/yourusername/gotui/cmd/gotui@latest
+brew install s21066/tap/gotui
 ```
 
-### Building from source
+### Go Install
 
 ```bash
-git clone https://github.com/yourusername/gotui.git
-cd gotui
+go install github.com/s21066/lazygotest/cmd/gotui@latest
+```
+
+### Direct Download
+
+Download the binary for your platform from the [latest release](https://github.com/s21066/lazygotest/releases/latest).
+
+### Build from Source
+
+```bash
+git clone https://github.com/s21066/lazygotest.git
+cd lazygotest
 go build -o gotui ./cmd/gotui
 ```
 
 ## Usage
 
-### Basic Usage
-
-Run in your Go project directory:
+### Quick Start
 
 ```bash
+# Run in your Go project
 gotui ./...
-```
 
-Or specify packages:
-
-```bash
+# Test specific packages
 gotui ./internal/... ./pkg/...
 ```
 
@@ -59,15 +65,16 @@ Flags:
   -editor string  Editor command (default $EDITOR or nvim)
   -p int          Package-level parallelism (default 1)
   -debug          Enable debug logging
+  -version        Print version information
 ```
 
 ### Keyboard Shortcuts
 
 #### Navigation
 - `Tab` / `Shift+Tab` - Switch between panels
-- `j` / `k` or `↓` / `↑` - Move up/down in test list
+- `j` / `k` or `↓` / `↑` - Navigate test list
 - `Space` - Toggle test selection
-- `Enter` - Focus on logs panel
+- `Enter` - Focus logs panel
 - `q` / `Ctrl+C` - Quit
 
 #### Test Execution
@@ -91,105 +98,72 @@ Flags:
 
 #### Other
 - `?` - Toggle help
-- `s` - Save logs (not implemented yet)
-- `o` - Open in editor (not implemented yet)
+- `s` - Save logs (planned)
+- `o` - Open in editor (planned)
 
-## UI Layout Overview
+## UI Overview
 
 ```
-┌─ TESTS (j/k move, l expand, h collapse, Space select, ? help) ─────────────┐
+┌─ TESTS (j/k move, Space select, ? help) ────────────────────────────────────┐
 │  ↑ 0/128  [pkg] internal/foo                                               │
-│    ✓ TestAdd             3ms     ⌁ flaky:2%                                │
-│    ✗ TestDivZero         2ms     msg: want4 got5                           │
+│    ✓ TestAdd             3ms                                               │
+│    ✗ TestDivZero         2ms     want:4 got:5                             │
 │  ▸ internal/bar                                                            │
 │  ▸ internal/baz                                                            │
-│  filter: /Div|Add/   chips: [failed][short]                                │
+│  filter: /Div|Add/   [failed][short]                                       │
 └────────────────────────────────────────────────────────────────────────────┘
-┌─ FLAGS (t tags g:-race c cover b bench z fuzz w watch o open-editor) ─────┐
+┌─ FLAGS (g:-race c:cover b:bench) ──────────────────────────────────────────┐
 │  -run=^(TestDivZero|TestAdd)$   -tags=integration   -race=ON   -short=OFF  │
 └────────────────────────────────────────────────────────────────────────────┘
-┌─ LOGS (Enter/Tab focus, ↑↓ scroll, s save, C-f search) ───────────────────┐
-│ === internal/foo · TestDivZero · FAIL (2ms)                               │
-│ --- want: 4                                                               │
-│ +++ got : 5                                                               │
-│ cmp.Diff: (-want +got)                                                    │
-│ -4                                                                        │
-│ +5                                                                        │
+┌─ LOGS (Enter focus, ↑↓ scroll) ────────────────────────────────────────────┐
+│ === TestDivZero · FAIL (2ms)                                              │
+│ --- want: 4                                                                │
+│ +++ got : 5                                                                │
 └────────────────────────────────────────────────────────────────────────────┘
-STATUS: ● Running pkg:foo (3/12) | PASS:10 FAIL:2 SKIP:0 | ⏱ 12.3s | R rerun failed  . repeat  q quit
+STATUS: ● Running (3/12) | PASS:10 FAIL:2 | ⏱ 12.3s | R:rerun . repeat q:quit
 ```
 
-### Visual Highlights
+## Architecture
 
-- Fixed color roles: PASS = green, FAIL = red, SKIP = yellow, RUNNING = blue
-- Focused panel uses a thick border and darker background for lazygit-style clarity
-- Columns are aligned to minimize eye travel; durations and counts are right-aligned
-- Active flags are rendered as rounded chips so toggles remain visible at a glance
-- The status bar always shows package progress, aggregated counts, and quick actions
-
-## Project Structure (Clean Architecture)
+Built with Clean Architecture principles:
 
 ```
 gotui/
-├── cmd/
-│   └── gotui/         # Main CLI entry point
+├── cmd/gotui/           # CLI entry point
 ├── internal/
-│   ├── adapter/       # Interface adapters
-│   │   ├── primary/   # Primary adapters (UI)
-│   │   │   └── tui/   # Terminal UI components
-│   │   └── secondary/ # Secondary adapters (Infrastructure)
-│   │       ├── config/     # Configuration management
-│   │       ├── runner/     # Test execution
-│   │       ├── pkgrepo/    # Package repository
-│   │       ├── fswatch/    # File system watching
-│   │       ├── editor/     # Editor integration
-│   │       └── cover/      # Coverage analysis
-│   ├── usecase/       # Business logic (use cases)
-│   │   ├── interfaces.go   # Port interfaces
-│   │   ├── run_tests.go    # Test execution use case
-│   │   └── list_packages.go # Package listing use case
-│   └── shared/        # Shared components
-│       ├── eventbus/  # Event bus implementation
-│       └── ring/      # Ring buffer for logs
-└── pkg/
-    ├── errors/        # Error handling utilities
-    └── logger/        # Logging utilities
+│   ├── adapter/         # Interface adapters
+│   │   ├── primary/     # UI components (TUI)
+│   │   └── secondary/   # Infrastructure (runner, config, etc.)
+│   ├── usecase/         # Business logic
+│   └── shared/          # Cross-cutting concerns
+└── pkg/                 # Reusable utilities
 ```
 
-### Architecture Overview
+### Design Principles
 
-This project follows **Clean Architecture** principles (Hexagonal Architecture):
-
-- **Use Cases** (`internal/usecase/`): Core business logic, framework-independent
-- **Adapters** (`internal/adapter/`): Interface between use cases and external world
-  - **Primary** (driving): UI components that call use cases
-  - **Secondary** (driven): Infrastructure components called by use cases
-- **Shared** (`internal/shared/`): Cross-cutting concerns like event bus
-- **Packages** (`pkg/`): Reusable utilities
+- **Clean Architecture**: Separation of concerns with clear boundaries
+- **Dependency Inversion**: Business logic doesn't depend on UI or infrastructure
+- **Event-driven**: Components communicate via events
+- **Testable**: Each layer can be tested independently
 
 ## Development
 
 ### Requirements
 
-- Go 1.22.1 or later
+- Go 1.22.1+
 - Terminal with 256-color support
 
-### Building
-
-```bash
-go build ./cmd/gotui
-```
-
-### Testing
+### Running Tests
 
 ```bash
 go test ./...
 ```
 
-### Linting
+### Debug Mode
 
 ```bash
-golangci-lint run ./...
+gotui -debug ./...
+# Logs written to debug.log
 ```
 
 ## Dependencies
