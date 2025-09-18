@@ -1,6 +1,6 @@
-# lazygotest
+# gotui
 
-An interactive terminal-based Go test runner with a modern TUI (Terminal User Interface) built using Bubble Tea.
+An interactive terminal-based Go test runner with a modern TUI (Terminal User Interface) built using Bubble Tea and Clean Architecture.
 
 ## Features
 
@@ -17,15 +17,15 @@ An interactive terminal-based Go test runner with a modern TUI (Terminal User In
 ### Using go install
 
 ```bash
-go install github.com/yourusername/lazygotest/cmd/lazytest@latest
+go install github.com/yourusername/gotui/cmd/gotui@latest
 ```
 
 ### Building from source
 
 ```bash
-git clone https://github.com/yourusername/lazygotest.git
-cd lazygotest
-go build -o lazytest ./cmd/lazytest
+git clone https://github.com/yourusername/gotui.git
+cd gotui
+go build -o gotui ./cmd/gotui
 ```
 
 ## Usage
@@ -35,19 +35,19 @@ go build -o lazytest ./cmd/lazytest
 Run in your Go project directory:
 
 ```bash
-lazytest ./...
+gotui ./...
 ```
 
 Or specify packages:
 
 ```bash
-lazytest ./internal/... ./pkg/...
+gotui ./internal/... ./pkg/...
 ```
 
 ### Command Line Options
 
 ```bash
-lazytest [flags] [packages]
+gotui [flags] [packages]
 
 Flags:
   -watch          Enable file watch mode
@@ -127,26 +127,45 @@ STATUS: ● Running pkg:foo (3/12) | PASS:10 FAIL:2 SKIP:0 | ⏱ 12.3s | R rerun
 - Active flags are rendered as rounded chips so toggles remain visible at a glance
 - The status bar always shows package progress, aggregated counts, and quick actions
 
-## Project Structure
+## Project Structure (Clean Architecture)
 
 ```
-lazygotest/
+gotui/
 ├── cmd/
-│   └── lazytest/       # Main CLI entry point
+│   └── gotui/         # Main CLI entry point
 ├── internal/
-│   ├── app/           # Main TUI application logic
-│   ├── config/        # Configuration management
-│   ├── core/          # Core test running logic
-│   │   ├── parse.go   # JSON test output parsing
-│   │   ├── run.go     # Test execution
-│   │   └── retry.go   # Failed test tracking
-│   ├── discovery/     # Package and test discovery
-│   └── ui/            # UI components and key bindings
-├── pkg/
-│   ├── types/         # Shared type definitions
-│   └── util/          # Utility functions
-└── scripts/           # Helper scripts
+│   ├── adapter/       # Interface adapters
+│   │   ├── primary/   # Primary adapters (UI)
+│   │   │   └── tui/   # Terminal UI components
+│   │   └── secondary/ # Secondary adapters (Infrastructure)
+│   │       ├── config/     # Configuration management
+│   │       ├── runner/     # Test execution
+│   │       ├── pkgrepo/    # Package repository
+│   │       ├── fswatch/    # File system watching
+│   │       ├── editor/     # Editor integration
+│   │       └── cover/      # Coverage analysis
+│   ├── usecase/       # Business logic (use cases)
+│   │   ├── interfaces.go   # Port interfaces
+│   │   ├── run_tests.go    # Test execution use case
+│   │   └── list_packages.go # Package listing use case
+│   └── shared/        # Shared components
+│       ├── eventbus/  # Event bus implementation
+│       └── ring/      # Ring buffer for logs
+└── pkg/
+    ├── errors/        # Error handling utilities
+    └── logger/        # Logging utilities
 ```
+
+### Architecture Overview
+
+This project follows **Clean Architecture** principles (Hexagonal Architecture):
+
+- **Use Cases** (`internal/usecase/`): Core business logic, framework-independent
+- **Adapters** (`internal/adapter/`): Interface between use cases and external world
+  - **Primary** (driving): UI components that call use cases
+  - **Secondary** (driven): Infrastructure components called by use cases
+- **Shared** (`internal/shared/`): Cross-cutting concerns like event bus
+- **Packages** (`pkg/`): Reusable utilities
 
 ## Development
 
@@ -158,7 +177,7 @@ lazygotest/
 ### Building
 
 ```bash
-go build ./cmd/lazytest
+go build ./cmd/gotui
 ```
 
 ### Testing
