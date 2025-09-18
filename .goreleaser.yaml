@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+project_name: gotui
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: gotui
+    main: ./cmd/gotui
+    binary: gotui
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .Commit }}
+      - -X main.date={{ .Date }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: default
+    builds: 
+      - gotui
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - '^build:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Performance Improvements'
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: 'Refactors'
+      regexp: '^.*?refactor(\([[:word:]]+\))??!?:.+$'
+      order: 3
+    - title: Other work
+      order: 999
+
+release:
+  github:
+    owner: s21066
+    name: lazygotest
+  draft: false
+  prerelease: auto
+  mode: append
+  name_template: "{{ .ProjectName }} v{{ .Version }}"
+  footer: |
+    ## Installation
+    
+    ### Homebrew (macOS/Linux)
+    ```bash
+    brew install s21066/tap/gotui
+    ```
+    
+    ### Direct Download
+    Download the appropriate archive for your platform from the assets below.
+
+# Homebrew Tap configuration
+# Requires s21066/homebrew-tap repository to be created
+brews:
+  - name: gotui
+    repository:
+      owner: s21066
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    homepage: "https://github.com/s21066/lazygotest"
+    description: "LazyGit-like TUI for running Go tests efficiently"
+    license: "MIT"
+    skip_upload: auto
+    test: |
+      system "#{bin}/gotui", "--version"
+    install: |
+      bin.install "gotui"
