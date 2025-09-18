@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -9,7 +11,26 @@ import (
 	"lazygotest/pkg/logger"
 )
 
+// Build-time variables injected via ldflags
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+)
+
 func main() {
+	// Parse command line flags
+	versionFlag := flag.Bool("version", false, "Print version information")
+	flag.Parse()
+
+	// Handle --version flag
+	if *versionFlag {
+		fmt.Printf("gotui version %s\n", version)
+		fmt.Printf("  commit: %s\n", commit)
+		fmt.Printf("  built:  %s\n", date)
+		os.Exit(0)
+	}
+
 	// Initialize debug logger
 	if err := logger.Init("debug.log"); err != nil {
 		logger.Error("Failed to initialize logger", "error", err)
