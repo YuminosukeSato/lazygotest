@@ -150,7 +150,7 @@ func (m *Model) handleTestEvent(event domain.TestEvent) {
 	// Update test results
 	if event.Test != "" {
 		testID := domain.TestID{
-			Pkg:  domain.PkgID(event.Package),
+			Pkg:  event.Package,
 			Name: event.Test,
 		}
 
@@ -304,7 +304,7 @@ func (m *Model) updateTestList() {
 
 	// Get tests for selected package
 	for _, test := range m.testResults {
-		if test.ID.Pkg != m.selectedPackage.ID {
+		if domain.PkgID(test.ID.Pkg) != m.selectedPackage.ID {
 			continue
 		}
 
@@ -372,7 +372,7 @@ func (m *Model) runSelectedTests() tea.Cmd {
 	// Get selected test IDs
 	var selectedIDs []domain.TestID
 	for testID, isSelected := range m.selectedTests {
-		if isSelected && testID.Pkg == m.selectedPackage.ID {
+		if isSelected && domain.PkgID(testID.Pkg) == m.selectedPackage.ID {
 			selectedIDs = append(selectedIDs, testID)
 		}
 	}

@@ -68,7 +68,7 @@ func (uc *RunTestsUseCase) ExecuteMultipleTests(ctx context.Context, testIDs []d
 	for _, testID := range testIDs {
 		// Escape special regex characters in test names
 		escapedName := regexp.QuoteMeta(testID.Name)
-		testsByPackage[testID.Pkg] = append(testsByPackage[testID.Pkg], escapedName)
+		testsByPackage[domain.PkgID(testID.Pkg)] = append(testsByPackage[domain.PkgID(testID.Pkg)], escapedName)
 	}
 
 	// For now, if tests are from same package, run them together

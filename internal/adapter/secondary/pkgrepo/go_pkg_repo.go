@@ -59,7 +59,7 @@ func (r *GoPackageRepo) ListPackages(ctx context.Context) ([]*domain.Package, er
 			ID:    domain.PkgID(pkgInfo.ImportPath),
 			Path:  pkgInfo.Dir,
 			Name:  pkgInfo.Name,
-			Tests: make(map[string]*domain.TestCase),
+			Tests: []domain.TestCase{},
 		}
 
 		packages = append(packages, pkg)
@@ -87,7 +87,7 @@ func (r *GoPackageRepo) GetPackage(ctx context.Context, pkgPath string) (*domain
 		ID:    domain.PkgID(pkgInfo.ImportPath),
 		Path:  pkgInfo.Dir,
 		Name:  pkgInfo.Name,
-		Tests: make(map[string]*domain.TestCase),
+		Tests: []domain.TestCase{},
 	}, nil
 }
 

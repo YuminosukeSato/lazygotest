@@ -169,7 +169,7 @@ func (m *Model) renderFooter() string {
 		// Add selection count if tests are selected
 		selectedCount := 0
 		for testID, isSelected := range m.selectedTests {
-			if isSelected && m.selectedPackage != nil && testID.Pkg == m.selectedPackage.ID {
+			if isSelected && m.selectedPackage != nil && domain.PkgID(testID.Pkg) == m.selectedPackage.ID {
 				selectedCount++
 			}
 		}
