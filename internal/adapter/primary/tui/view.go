@@ -92,7 +92,7 @@ func (m *Model) render() string {
 
 // renderHeader renders the header bar
 func (m *Model) renderHeader() string {
-	title := "gotui v0.1"
+	title := "lazygotest v0.1"
 
 	flags := []string{}
 	if m.raceDetection {
