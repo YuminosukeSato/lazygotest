@@ -1,4 +1,4 @@
-# gotui
+# lazygotest
 
 A LazyGit-inspired TUI for running Go tests with an interactive, keyboard-driven interface.
 
@@ -17,13 +17,13 @@ A LazyGit-inspired TUI for running Go tests with an interactive, keyboard-driven
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install s21066/tap/gotui
+brew install s21066/tap/lazygotest
 ```
 
 ### Go Install
 
 ```bash
-go install github.com/s21066/lazygotest/cmd/gotui@latest
+go get github.com/s21066/lazygotest/cmd/lazygotest@latest
 ```
 
 ### Direct Download
@@ -35,7 +35,7 @@ Download the binary for your platform from the [latest release](https://github.c
 ```bash
 git clone https://github.com/s21066/lazygotest.git
 cd lazygotest
-go build -o gotui ./cmd/gotui
+go build -o lazygotest ./cmd/lazygotest
 ```
 
 ## Usage
@@ -44,16 +44,16 @@ go build -o gotui ./cmd/gotui
 
 ```bash
 # Run in your Go project
-gotui ./...
+lazygotest ./...
 
 # Test specific packages
-gotui ./internal/... ./pkg/...
+lazygotest ./internal/... ./pkg/...
 ```
 
 ### Command Line Options
 
 ```bash
-gotui [flags] [packages]
+lazygotest [flags] [packages]
 
 Flags:
   -watch          Enable file watch mode
@@ -131,8 +131,8 @@ STATUS: ● Running pkg:foo (3/12) | PASS:10 FAIL:2 SKIP:0 | ⏱ 12.3s | R rerun
 Built with Clean Architecture principles:
 
 ```
-gotui/
-├── cmd/gotui/           # CLI entry point
+lazygotest/
+├── cmd/lazygotest/           # CLI entry point
 ├── internal/
 │   ├── adapter/         # Interface adapters
 │   │   ├── primary/     # UI components (TUI)
@@ -165,7 +165,7 @@ go test ./...
 ### Debug Mode
 
 ```bash
-gotui -debug ./...
+lazygotest -debug ./...
 # Logs written to debug.log
 ```
 

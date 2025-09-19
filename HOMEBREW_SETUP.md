@@ -1,6 +1,6 @@
 # Homebrew Distribution Setup
 
-A simple guide to distribute `gotui` via Homebrew.
+A simple guide to distribute `lazygotest` via Homebrew.
 
 ## Prerequisites
 
@@ -75,10 +75,10 @@ After the release completes (wait a few minutes):
 brew tap s21066/tap
 
 # Install
-brew install gotui
+brew install lazygotest
 
 # Verify
-gotui --version
+lazygotest --version
 ```
 
 ## Troubleshooting
