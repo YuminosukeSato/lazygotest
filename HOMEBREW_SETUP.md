@@ -21,10 +21,10 @@ A simple guide to distribute `lazygotest` via Homebrew.
 ```bash
 mkdir -p ~/repos
 cd ~/repos
-git clone https://github.com/s21066/homebrew-tap.git
+git clone https://github.com/YuminosukeSato/homebrew-tap.git
 cd homebrew-tap
 mkdir Formula
-echo "# Homebrew Tap for s21066 tools" > README.md
+echo "# Homebrew Tap for YuminosukeSato tools" > README.md
 git add .
 git commit -m "Initial commit"
 git push origin main
@@ -72,7 +72,7 @@ After the release completes (wait a few minutes):
 
 ```bash
 # Add your tap
-brew tap s21066/tap
+brew tap YuminosukeSato/tap
 
 # Install
 brew install lazygotest
@@ -90,7 +90,7 @@ lazygotest --version
 
 ### If Homebrew Installation Fails
 - Run `brew update`
-- Reset tap: `brew untap s21066/tap && brew tap s21066/tap`
+- Reset tap: `brew untap YuminosukeSato/tap && brew tap YuminosukeSato/tap`
 
 ## Future Releases
 

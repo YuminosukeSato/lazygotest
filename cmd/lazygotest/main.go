@@ -7,8 +7,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"lazygotest/internal/adapter/primary/tui"
-	"lazygotest/pkg/logger"
+	"github.com/YuminosukeSato/lazygotest/internal/adapter/primary/tui"
+	"github.com/YuminosukeSato/lazygotest/pkg/logger"
 )
 
 // Build-time variables injected via ldflags

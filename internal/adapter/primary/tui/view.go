@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"lazygotest/internal/domain"
+	"github.com/YuminosukeSato/lazygotest/internal/domain"
 )
 
 var (

@@ -8,12 +8,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"lazygotest/internal/adapter/secondary/pkgrepo"
-	"lazygotest/internal/adapter/secondary/runner"
-	"lazygotest/internal/domain"
-	"lazygotest/internal/shared/eventbus"
-	"lazygotest/internal/usecase"
-	"lazygotest/pkg/logger"
+	"github.com/YuminosukeSato/lazygotest/internal/adapter/secondary/pkgrepo"
+	"github.com/YuminosukeSato/lazygotest/internal/adapter/secondary/runner"
+	"github.com/YuminosukeSato/lazygotest/internal/domain"
+	"github.com/YuminosukeSato/lazygotest/internal/shared/eventbus"
+	"github.com/YuminosukeSato/lazygotest/internal/usecase"
+	"github.com/YuminosukeSato/lazygotest/pkg/logger"
 )
 
 // FocusedPane represents which pane has focus

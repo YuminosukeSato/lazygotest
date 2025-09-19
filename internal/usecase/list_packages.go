@@ -3,9 +3,9 @@ package usecase
 import (
 	"context"
 
-	"lazygotest/internal/domain"
-	"lazygotest/internal/shared/eventbus"
-	"lazygotest/pkg/logger"
+	"github.com/YuminosukeSato/lazygotest/internal/domain"
+	"github.com/YuminosukeSato/lazygotest/internal/shared/eventbus"
+	"github.com/YuminosukeSato/lazygotest/pkg/logger"
 )
 
 // ListPackagesUseCase handles package discovery

@@ -17,23 +17,23 @@ A LazyGit-inspired TUI for running Go tests with an interactive, keyboard-driven
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install s21066/tap/lazygotest
+brew install YuminosukeSato/tap/lazygotest
 ```
 
 ### Go Install
 
 ```bash
-go get github.com/s21066/lazygotest/cmd/lazygotest@latest
+go install github.com/YuminosukeSato/lazygotest/cmd/lazygotest@latest
 ```
 
 ### Direct Download
 
-Download the binary for your platform from the [latest release](https://github.com/s21066/lazygotest/releases/latest).
+Download the binary for your platform from the [latest release](https://github.com/YuminosukeSato/lazygotest/releases/latest).
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/s21066/lazygotest.git
+git clone https://github.com/YuminosukeSato/lazygotest.git
 cd lazygotest
 go build -o lazygotest ./cmd/lazygotest
 ```

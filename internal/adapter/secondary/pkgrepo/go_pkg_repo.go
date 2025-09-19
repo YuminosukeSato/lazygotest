@@ -6,9 +6,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"lazygotest/internal/domain"
-	"lazygotest/pkg/errors"
-	"lazygotest/pkg/logger"
+	"github.com/YuminosukeSato/lazygotest/internal/domain"
+	"github.com/YuminosukeSato/lazygotest/pkg/errors"
+	"github.com/YuminosukeSato/lazygotest/pkg/logger"
 )
 
 // GoPackageInfo represents the JSON output from go list

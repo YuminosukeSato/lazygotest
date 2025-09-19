@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"lazygotest/internal/domain"
-	"lazygotest/pkg/errors"
-	"lazygotest/pkg/logger"
+	"github.com/YuminosukeSato/lazygotest/internal/domain"
+	"github.com/YuminosukeSato/lazygotest/pkg/errors"
+	"github.com/YuminosukeSato/lazygotest/pkg/logger"
 )
 
 // RunOptions configures test execution

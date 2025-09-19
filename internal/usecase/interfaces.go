@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 
-	"lazygotest/internal/adapter/secondary/runner"
-	"lazygotest/internal/domain"
+	"github.com/YuminosukeSato/lazygotest/internal/adapter/secondary/runner"
+	"github.com/YuminosukeSato/lazygotest/internal/domain"
 )
 
 // PackageRepository defines package discovery operations

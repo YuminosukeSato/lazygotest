@@ -1,4 +1,4 @@
-module lazygotest
+module github.com/YuminosukeSato/lazygotest
 
 go 1.23.0
 
