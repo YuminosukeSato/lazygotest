@@ -25,7 +25,7 @@ func main() {
 
 	// Handle --version flag
 	if *versionFlag {
-		fmt.Printf("gotui version %s\n", version)
+		fmt.Printf("lazygotest version %s\n", version)
 		fmt.Printf("  commit: %s\n", commit)
 		fmt.Printf("  built:  %s\n", date)
 		os.Exit(0)
@@ -42,7 +42,7 @@ func main() {
 		}
 	}()
 
-	logger.Debug("Starting gotui application")
+	logger.Debug("Starting lazygotest application")
 
 	// Create and run the TUI application
 	app := tui.New()
