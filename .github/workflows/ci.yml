@@ -115,15 +115,15 @@ jobs:
         run: go mod download
 
       - name: Build binary
-        run: go build -v ./cmd/gotui
+        run: go build -v ./cmd/lazygotest
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gotui-${{ matrix.os }}-${{ matrix.go-version }}
+          name: lazygotest-${{ matrix.os }}-${{ matrix.go-version }}
           path: |
-            gotui
-            gotui.exe
+            lazygotest
+            lazygotest.exe
           retention-days: 7
           if-no-files-found: ignore
 

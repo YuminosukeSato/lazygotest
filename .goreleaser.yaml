@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-project_name: gotui
+project_name: lazygotest
 
 before:
   hooks:
@@ -7,9 +7,9 @@ before:
     - go mod download
 
 builds:
-  - id: gotui
-    main: ./cmd/gotui
-    binary: gotui
+  - id: lazygotest
+    main: ./cmd/lazygotest
+    binary: lazygotest
     env:
       - CGO_ENABLED=0
     flags:
@@ -33,7 +33,7 @@ builds:
 archives:
   - id: default
     builds: 
-      - gotui
+      - lazygotest
     name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     format_overrides:
       - goos: windows
@@ -88,7 +88,12 @@ release:
     
     ### Homebrew (macOS/Linux)
     ```bash
-    brew install s21066/tap/gotui
+    brew install s21066/tap/lazygotest
+    ```
+    
+    ### Go Install
+    ```bash
+    go install github.com/YuminosukeSato/lazygotest/cmd/lazygotest@latest
     ```
     
     ### Direct Download
@@ -97,7 +102,7 @@ release:
 # Homebrew Tap configuration
 # Requires s21066/homebrew-tap repository to be created
 brews:
-  - name: gotui
+  - name: lazygotest
     repository:
       owner: s21066
       name: homebrew-tap
@@ -112,6 +117,6 @@ brews:
     license: "MIT"
     skip_upload: auto
     test: |
-      system "#{bin}/gotui", "--version"
+      system "#{bin}/lazygotest", "--version"
     install: |
-      bin.install "gotui"
+      bin.install "lazygotest"
