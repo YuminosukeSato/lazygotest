@@ -41,10 +41,10 @@ const (
 
 // Legacy status constants for compatibility
 const (
-	StatusRunning  = TestStatusRunning
-	StatusPassed   = TestStatusPassed
-	StatusFailed   = TestStatusFailed
-	StatusSkipped  = TestStatusSkipped
+	StatusRunning = TestStatusRunning
+	StatusPassed  = TestStatusPassed
+	StatusFailed  = TestStatusFailed
+	StatusSkipped = TestStatusSkipped
 )
 
 // FailInfo represents failure information for a test
