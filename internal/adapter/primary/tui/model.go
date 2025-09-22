@@ -2,11 +2,12 @@ package tui
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/fsnotify/fsnotify"
 
 	"github.com/YuminosukeSato/lazygotest/internal/adapter/secondary/pkgrepo"
 	"github.com/YuminosukeSato/lazygotest/internal/adapter/secondary/runner"
@@ -33,23 +34,35 @@ type Model struct {
 	height           int
 	packageList      list.Model
 	testList         list.Model
-	detailsContent   []string
-	detailsScrollPos int    // Current scroll position in details pane
-	detailsMaxScroll int    // Maximum scroll position
-	lastKey          string // For multi-key commands like gg
+	detailsBuffer    *RingBuffer // Ring buffer for efficient memory management
+	detailsContent   []string    // Cached lines from ring buffer for rendering
+	detailsScrollPos int         // Current scroll position in details pane
+	detailsMaxScroll int         // Maximum scroll position
+	lastKey          string      // For multi-key commands like gg
 
 	// Domain State
 	packages        []*domain.Package
 	selectedPackage *domain.Package
 	selectedTest    *domain.TestCase
 	testResults     map[domain.TestID]*domain.TestCase
+	testTrees       map[string]*domain.TestTree // Package ID -> TestTree
 	summary         *domain.TestSummary
 	selectedTests   map[domain.TestID]bool // Track selected tests for batch execution
 
+	// View State
+	treeViewMode bool // Toggle between tree and list view
+	treeRenderer *TreeRenderer
+	
+	// Watcher State
+	watcher      *fsnotify.Watcher
+	watcherStop  chan struct{}
+	program      *tea.Program // Reference to the Bubble Tea program
+
 	// Dependencies
-	listPkgsUC *usecase.ListPackagesUseCase
-	runTestsUC *usecase.RunTestsUseCase
-	eventBus   *eventbus.EventBus
+	listPkgsUC     *usecase.ListPackagesUseCase
+	runTestsUC     *usecase.RunTestsUseCase
+	eventBus       *eventbus.EventBus
+	parallelRunner *ParallelRunner // For parallel test execution
 
 	// Flags
 	isRunning       bool
@@ -57,6 +70,7 @@ type Model struct {
 	watchMode       bool
 	raceDetection   bool
 	coverageEnabled bool
+	parallelMode    bool // Enable parallel execution
 
 	// Context for cancellation
 	ctx    context.Context
@@ -72,6 +86,7 @@ func New() *Model {
 
 	listPkgsUC := usecase.NewListPackagesUseCase(pkgRepo, bus)
 	runTestsUC := usecase.NewRunTestsUseCase(testRunner, bus)
+	parallelRunner := NewParallelRunner(runTestsUC)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -79,25 +94,30 @@ func New() *Model {
 		focusedPane:    PackagesPane,
 		packages:       make([]*domain.Package, 0),
 		testResults:    make(map[domain.TestID]*domain.TestCase),
+		testTrees:      make(map[string]*domain.TestTree),
 		selectedTests:  make(map[domain.TestID]bool),
+		detailsBuffer:  NewRingBuffer(5000), // 5000 lines max
 		detailsContent: make([]string, 0),
 		listPkgsUC:     listPkgsUC,
 		runTestsUC:     runTestsUC,
 		eventBus:       bus,
+		parallelRunner: parallelRunner,
 		ctx:            ctx,
 		cancel:         cancel,
+		treeViewMode:   true,                // Default to tree view
+		treeRenderer:   NewTreeRenderer(80), // Will be resized in updateSizes
 	}
 
 	// Initialize lists with custom styles
 	packageDelegate := list.NewDefaultDelegate()
 	packageDelegate.ShowDescription = true
 	packageDelegate.Styles.SelectedTitle = packageDelegate.Styles.SelectedTitle.
-		Background(lipgloss.Color("#3C3C3C")).
-		Foreground(lipgloss.Color("#FFFFFF")).
+		Background(surfaceEmphasisColor).
+		Foreground(textPrimaryColor).
 		Bold(true)
 	packageDelegate.Styles.SelectedDesc = packageDelegate.Styles.SelectedDesc.
-		Background(lipgloss.Color("#3C3C3C")).
-		Foreground(lipgloss.Color("#CCCCCC"))
+		Background(surfaceEmphasisColor).
+		Foreground(mutedColor)
 
 	// Use custom test delegate with colored backgrounds
 	testDelegate := list.NewDefaultDelegate()
@@ -106,12 +126,12 @@ func New() *Model {
 	// Custom styles for test items based on status
 	// These will be overridden by item-specific rendering
 	testDelegate.Styles.SelectedTitle = testDelegate.Styles.SelectedTitle.
-		Background(lipgloss.Color("#3C3C3C")).
-		Foreground(lipgloss.Color("#FFFFFF")).
+		Background(surfaceEmphasisColor).
+		Foreground(textPrimaryColor).
 		Bold(true)
 	testDelegate.Styles.SelectedDesc = testDelegate.Styles.SelectedDesc.
-		Background(lipgloss.Color("#3C3C3C")).
-		Foreground(lipgloss.Color("#CCCCCC"))
+		Background(surfaceEmphasisColor).
+		Foreground(mutedColor)
 
 	m.packageList = list.New([]list.Item{}, packageDelegate, 0, 0)
 	m.packageList.Title = "" // We handle title in render
@@ -161,6 +181,19 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case errorMsg:
 		logger.Error("Error occurred", "error", msg.err)
 		m.appendDetail("Error: " + msg.err.Error())
+		
+	case fileChangeMsg:
+		cmds = append(cmds, m.handleFileChange(msg))
+		
+	case watcherStartedMsg:
+		m.appendDetail("Watch mode enabled - monitoring file changes")
+		
+	case watcherStoppedMsg:
+		m.appendDetail("Watch mode disabled")
+		
+	case watcherErrorMsg:
+		logger.Error("Watcher error", "error", msg.err)
+		m.appendDetail("Watch error: " + msg.err.Error())
 	}
 
 	// Update the focused list
@@ -222,6 +255,31 @@ func (m *Model) handleKeyPress(msg tea.KeyMsg) tea.Cmd {
 
 	case "W":
 		m.watchMode = !m.watchMode
+		if m.watchMode {
+			return m.startWatcher()
+		} else {
+			return m.stopWatcher()
+		}
+
+	case "P": // Toggle parallel execution mode
+		m.parallelMode = !m.parallelMode
+		if m.parallelMode {
+			m.appendDetail("Parallel execution enabled (max workers: " + strconv.Itoa(m.parallelRunner.GetMaxWorkers()) + ")")
+		} else {
+			m.appendDetail("Parallel execution disabled")
+		}
+		return nil
+
+	case "p": // Run all packages in parallel
+		if m.parallelMode {
+			return m.runAllPackagesParallel()
+		}
+		return nil
+
+	case "o": // Open file in editor at specific line
+		if m.focusedPane == DetailsPane {
+			return m.handleEditorJump()
+		}
 		return nil
 
 	case " ": // Space key for selection toggle
@@ -266,10 +324,8 @@ func (m *Model) handleListVimKeys(msg tea.KeyMsg) tea.Cmd {
 	}
 
 	switch msg.String() {
-	case "j", "down":
-		targetList.CursorDown()
-	case "k", "up":
-		targetList.CursorUp()
+	// j/k キーの処理を削除（リストのデフォルト処理に任せる）
+	// これにより二重処理によるカーソル飛ばし問題を解消
 	case "g":
 		// Wait for second 'g' for gg command
 		if m.lastKey == "g" {

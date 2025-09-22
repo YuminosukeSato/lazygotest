@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,6 +14,11 @@ import (
 	"github.com/YuminosukeSato/lazygotest/internal/shared/eventbus"
 	"github.com/YuminosukeSato/lazygotest/pkg/logger"
 )
+
+// formatInt converts int to string
+func formatInt(n int) string {
+	return strconv.Itoa(n)
+}
 
 // Message types
 type packagesLoadedMsg struct {
@@ -45,13 +51,49 @@ func (m *Model) runAllTests() tea.Cmd {
 	}
 
 	m.isRunning = true
-	m.detailsContent = []string{"Running all tests..."}
+	m.detailsBuffer.Clear()
+	m.detailsBuffer.Add("Running all tests...")
+	m.detailsContent = m.detailsBuffer.GetLines()
 
 	return func() tea.Msg {
 		err := m.runTestsUC.ExecuteAll(m.ctx)
 		if err != nil {
 			return errorMsg{err: err}
 		}
+		return nil
+	}
+}
+
+// runAllPackagesParallel runs all packages in parallel
+func (m *Model) runAllPackagesParallel() tea.Cmd {
+	if m.isRunning || len(m.packages) == 0 {
+		return nil
+	}
+
+	m.isRunning = true
+	m.detailsBuffer.Clear()
+	m.detailsBuffer.Add("Running all packages in parallel...")
+	m.detailsBuffer.Add("Max workers: " + formatInt(m.parallelRunner.GetMaxWorkers()))
+	m.detailsContent = m.detailsBuffer.GetLines()
+
+	return func() tea.Msg {
+		err := m.parallelRunner.RunPackagesParallel(m.ctx, m.packages, m.raceDetection, m.coverageEnabled)
+		if err != nil {
+			m.isRunning = false
+			return errorMsg{err: err}
+		}
+
+		// Get aggregated summary
+		m.summary = m.parallelRunner.GetTotalSummary()
+		m.isRunning = false
+
+		// Log completion
+		m.appendDetail("Parallel execution completed")
+		m.appendDetail("Total: " + formatInt(m.summary.Total) + 
+			" | Passed: " + formatInt(m.summary.Passed) +
+			" | Failed: " + formatInt(m.summary.Failed) +
+			" | Skipped: " + formatInt(m.summary.Skipped))
+
 		return nil
 	}
 }
@@ -63,7 +105,9 @@ func (m *Model) runSelectedPackage() tea.Cmd {
 	}
 
 	m.isRunning = true
-	m.detailsContent = []string{"Running tests in " + m.selectedPackage.Name + "..."}
+	m.detailsBuffer.Clear()
+	m.detailsBuffer.Add("Running tests in " + m.selectedPackage.Name + "...")
+	m.detailsContent = m.detailsBuffer.GetLines()
 
 	return func() tea.Msg {
 		err := m.runTestsUC.ExecutePackage(m.ctx, m.selectedPackage.ID)
@@ -81,7 +125,9 @@ func (m *Model) rerunTest() tea.Cmd {
 	}
 
 	m.isRunning = true
-	m.detailsContent = []string{"Running " + m.selectedTest.ID.Name + "..."}
+	m.detailsBuffer.Clear()
+	m.detailsBuffer.Add("Running " + m.selectedTest.ID.Name + "...")
+	m.detailsContent = m.detailsBuffer.GetLines()
 
 	return func() tea.Msg {
 		err := m.runTestsUC.ExecuteTest(m.ctx, m.selectedTest.ID)
@@ -147,7 +193,10 @@ func (m *Model) handleTestEventAsync(event domain.TestEvent) {
 func (m *Model) handleTestEvent(event domain.TestEvent) {
 	logger.Debug("Handling test event", "event", event)
 
-	// Update test results
+	// Build/update the test tree
+	m.BuildTestTree(event)
+
+	// Update test results (for backward compatibility with list view)
 	if event.Test != "" {
 		testID := domain.TestID{
 			Pkg:  event.Package,
@@ -168,12 +217,18 @@ func (m *Model) handleTestEvent(event domain.TestEvent) {
 			test.Status = domain.StatusRunning
 		case "pass":
 			test.Status = domain.StatusPassed
+			if event.Elapsed > 0 {
+				test.Duration = time.Duration(event.Elapsed * float64(time.Second))
+			}
 		case "fail":
 			test.Status = domain.StatusFailed
 			if test.LastFail == nil {
 				test.LastFail = &domain.FailInfo{}
 			}
 			test.LastFail.FullLog = strings.Join(test.Logs, "\n")
+			if event.Elapsed > 0 {
+				test.Duration = time.Duration(event.Elapsed * float64(time.Second))
+			}
 		case "skip":
 			test.Status = domain.StatusSkipped
 		case "output":
@@ -191,11 +246,10 @@ func (m *Model) handleTestEvent(event domain.TestEvent) {
 
 // appendDetail adds a line to the details pane
 func (m *Model) appendDetail(line string) {
-	const maxLines = 1000
-	m.detailsContent = append(m.detailsContent, line)
-	if len(m.detailsContent) > maxLines {
-		m.detailsContent = m.detailsContent[len(m.detailsContent)-maxLines:]
-	}
+	// Add to ring buffer
+	m.detailsBuffer.Add(line)
+	// Update cached content for rendering
+	m.detailsContent = m.detailsBuffer.GetLines()
 }
 
 // focusNextPane moves focus to the next pane
@@ -245,19 +299,16 @@ func (i testItem) Title() string {
 	switch i.test.Status {
 	case domain.StatusPassed:
 		status = "✓"
-		// Green background for passed tests
-		statusStyle = statusStyle.Background(lipgloss.Color("#1B4F1B")).
-			Foreground(lipgloss.Color("#FFFFFF"))
+		statusStyle = statusStyle.Background(successBadgeBg).
+			Foreground(textPrimaryColor)
 	case domain.StatusFailed:
 		status = "✗"
-		// Red background for failed tests
-		statusStyle = statusStyle.Background(lipgloss.Color("#5C1F1F")).
-			Foreground(lipgloss.Color("#FFFFFF"))
+		statusStyle = statusStyle.Background(failureBadgeBg).
+			Foreground(textPrimaryColor)
 	case domain.StatusRunning:
 		status = "⟳"
-		// Orange background for running tests
-		statusStyle = statusStyle.Background(lipgloss.Color("#4A3800")).
-			Foreground(lipgloss.Color("#FFFFFF"))
+		statusStyle = statusStyle.Background(warningBadgeBg).
+			Foreground(textPrimaryColor)
 	case domain.StatusSkipped:
 		status = "-"
 	default:
@@ -268,7 +319,7 @@ func (i testItem) Title() string {
 	fullText := checkbox + " " + status + " " + i.test.ID.Name
 
 	// Apply background color if test has been run
-	if i.test.Status == domain.StatusPassed || i.test.Status == domain.StatusFailed {
+	if i.test.Status == domain.StatusPassed || i.test.Status == domain.StatusFailed || i.test.Status == domain.StatusRunning {
 		return statusStyle.Width(40).Render(fullText)
 	}
 
