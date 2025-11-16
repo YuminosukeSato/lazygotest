@@ -11,8 +11,17 @@ export GOTOOLCHAIN=local
 
 cd "${REPO_ROOT}"
 
-echo "== go test =="
-go test ./...
+profile="${PROFILE:-unit}"
+run_args=()
+case "${profile}" in
+  race)   run_args+=("-race");;
+  cover)  run_args+=("-cover");;
+  short)  run_args+=("-short");;
+  *)      profile="unit";;
+esac
+
+echo "== go test (${profile}) =="
+go test ${run_args[@]+"${run_args[@]}"} ./...
 
 echo "== golangci-lint =="
 golangci-lint run ./...

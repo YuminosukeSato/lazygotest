@@ -9,9 +9,9 @@ Command-line helpers to catalog and run Go tests in a TDD-friendly way.
 - Offline-friendly: uses workspace caches (`GOCACHE`, `GOLANGCI_LINT_CACHE`).
 
 ## Usage
-1. Run `GOCACHE=.cache/go-build go test ./...` to ensure tests pass with local caches.
-2. Run `GOCACHE=.cache/go-build GOTOOLCHAIN=local GOLANGCI_LINT_CACHE=.cache/golangci-lint golangci-lint run ./...`.
-3. Integrate `internal/interfaces/process` adapters into your TUI or CLI.
+1. Run `./scripts/check.sh` (defaults to PROFILE=unit).  
+   - `PROFILE=race` adds `-race`, `PROFILE=cover` adds `-cover`, `PROFILE=short` adds `-short`.
+2. Integrate `internal/interfaces/process` adapters into your TUI or CLI.
 
 ## Development
 - Follow TDD: add a failing test, implement the minimum, then refactor.
