@@ -10,7 +10,7 @@ Command-line helpers to catalog and run Go tests in a TDD-friendly way.
 
 ## Usage
 1. Run `./scripts/check.sh` (defaults to PROFILE=unit).  
-   - `PROFILE=race` adds `-race`, `PROFILE=cover` adds `-cover`, `PROFILE=short` adds `-short`.
+   - `PROFILE=race` adds `-race`, `PROFILE=cover` adds `-cover`, `PROFILE=short` adds `-short`, `RUN=TestName` adds `-run ^TestName$`.
 2. Integrate `internal/interfaces/process` adapters into your TUI or CLI.
 
 ## Development

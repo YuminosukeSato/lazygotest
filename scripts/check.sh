@@ -19,6 +19,9 @@ case "${profile}" in
   short)  run_args+=("-short");;
   *)      profile="unit";;
 esac
+if [[ -n "${RUN:-}" ]]; then
+  run_args+=("-run" "^${RUN}$")
+fi
 
 echo "== go test (${profile}) =="
 go test ${run_args[@]+"${run_args[@]}"} ./...
