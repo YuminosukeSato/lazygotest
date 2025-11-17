@@ -104,7 +104,6 @@ func (h *HistoryAdapter) SetItems(items []presentation.RunRow) {
 func (h *HistoryAdapter) ScrollToEnd() {
 	if rows := h.GetRowCount(); rows > 0 {
 		h.Select(rows-1, 0)
-		h.ScrollToBeginning() // move view; Select already highlights last
 	}
 }
 

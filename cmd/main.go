@@ -1,3 +1,5 @@
+//go:build !tview
+
 package main
 
 import (

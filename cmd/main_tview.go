@@ -11,7 +11,6 @@ import (
 	"github.com/s21066/lazygotest/internal/application/catalogsync"
 	"github.com/s21066/lazygotest/internal/application/testrun"
 	"github.com/s21066/lazygotest/internal/interfaces/process"
-	"github.com/s21066/lazygotest/internal/presentation"
 	"github.com/s21066/lazygotest/internal/ui"
 )
 
