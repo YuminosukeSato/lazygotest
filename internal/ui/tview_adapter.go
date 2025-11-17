@@ -81,3 +81,4 @@ func NewLogAdapter() *LogAdapter { return &LogAdapter{} }
 
 func (l *LogAdapter) Append(line string) { l.lines = append(l.lines, line) }
 func (l *LogAdapter) Clear()             { l.lines = nil }
+func (l *LogAdapter) ScrollToEnd()       {}

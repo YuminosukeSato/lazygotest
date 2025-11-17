@@ -60,6 +60,7 @@ type fakeLog struct {
 
 func (f *fakeLog) Append(line string) { f.lines = append(f.lines, line) }
 func (f *fakeLog) Clear()             { f.lines = nil }
+func (f *fakeLog) ScrollToEnd()       {}
 
 type fakeRunner struct {
 	res process.TestResult

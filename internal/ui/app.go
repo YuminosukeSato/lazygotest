@@ -35,6 +35,7 @@ type HistoryView interface {
 type LogView interface {
 	Append(line string)
 	Clear()
+	ScrollToEnd()
 }
 
 type App struct {
@@ -48,6 +49,7 @@ type App struct {
 	runs     []execution.Run
 	runner   testrun.Service
 	filter   string
+	helpOpen bool
 }
 
 func NewApp(tree TreeView, tests ListView, history HistoryView, log LogView, runner testrun.Service) *App {
@@ -98,8 +100,10 @@ func (a *App) HandleKey(key string) bool {
 		_ = a.rerunLast()
 		return true
 	case "/":
-		a.ApplyFilter("")
-		a.log.Append("filter reset")
+		a.filterPrompt()
+		return true
+	case "?":
+		a.toggleHelp()
 		return true
 	case "q":
 		// caller decides to quit
@@ -177,6 +181,23 @@ func (a *App) ApplyFilter(term string) {
 		}
 	}
 	a.tests.SetItems(filtered)
+}
+
+func (a *App) filterPrompt() {
+	// headless placeholder: just clear filter; real UI should open input modal
+	a.ApplyFilter("")
+	a.log.Append("filter: cleared")
+	a.log.ScrollToEnd()
+}
+
+func (a *App) toggleHelp() {
+	a.helpOpen = !a.helpOpen
+	if a.helpOpen {
+		a.log.Append("keys: h/j/k/l gg/G Enter r / ? q")
+	} else {
+		a.log.Append("help closed")
+	}
+	a.log.ScrollToEnd()
 }
 
 // Runs returns a copy of run history (primarily for tests).
