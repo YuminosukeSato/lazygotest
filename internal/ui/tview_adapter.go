@@ -1,85 +1,126 @@
-//go:build !tview
-
 package ui
 
-import "github.com/s21066/lazygotest/internal/presentation"
+import (
+	"github.com/rivo/tview"
+	"github.com/s21066/lazygotest/internal/presentation"
+)
 
-// NOTE: This is a thin local adapter for offline builds (no external deps).
-
+// TreeAdapter wraps tview.TreeView and keeps index-based selection.
 type TreeAdapter struct {
-	items []presentation.PackageNode
-	cur   int
+	*tview.TreeView
+	nodes   []*tview.TreeNode
+	current int
 }
 
-func NewTreeAdapter() *TreeAdapter { return &TreeAdapter{cur: 0} }
+func NewTreeAdapter() *TreeAdapter {
+	tv := tview.NewTreeView()
+	return &TreeAdapter{TreeView: tv, current: 0}
+}
 
 func (t *TreeAdapter) SetItems(items []presentation.PackageNode) {
-	t.items = items
-	if t.cur >= len(t.items) {
-		t.cur = len(t.items) - 1
+	root := tview.NewTreeNode("packages")
+	t.nodes = make([]*tview.TreeNode, len(items))
+	for i, item := range items {
+		node := tview.NewTreeNode(item.Label).SetReference(i)
+		t.nodes[i] = node
+		root.AddChild(node)
 	}
-	if t.cur < 0 {
-		t.cur = 0
+	t.current = 0
+	t.SetRoot(root)
+	if len(t.nodes) > 0 {
+		t.SetCurrentNode(t.nodes[0])
 	}
 }
 
 func (t *TreeAdapter) Move(delta int) {
-	t.cur += delta
-	if t.cur < 0 {
-		t.cur = 0
+	if len(t.nodes) == 0 {
+		return
 	}
-	if t.cur >= len(t.items) {
-		t.cur = len(t.items) - 1
+	t.current += delta
+	if t.current < 0 {
+		t.current = 0
 	}
+	if t.current >= len(t.nodes) {
+		t.current = len(t.nodes) - 1
+	}
+	t.SetCurrentNode(t.nodes[t.current])
 }
 
-func (t *TreeAdapter) Current() int { return t.cur }
+func (t *TreeAdapter) Current() int { return t.current }
 
 type ListAdapter struct {
-	items []presentation.TestRow
-	cur   int
+	*tview.List
 }
 
-func NewListAdapter() *ListAdapter { return &ListAdapter{cur: 0} }
+func NewListAdapter() *ListAdapter {
+	return &ListAdapter{List: tview.NewList()}
+}
 
 func (l *ListAdapter) SetItems(items []presentation.TestRow) {
-	l.items = items
-	if l.cur >= len(l.items) {
-		l.cur = len(l.items) - 1
-	}
-	if l.cur < 0 {
-		l.cur = 0
+	l.Clear()
+	for _, it := range items {
+		l.AddItem(it.Name, string(it.Kind), 0, nil)
 	}
 }
 
 func (l *ListAdapter) Move(delta int) {
-	l.cur += delta
-	if l.cur < 0 {
-		l.cur = 0
+	count := l.GetItemCount()
+	if count == 0 {
+		return
 	}
-	if l.cur >= len(l.items) {
-		l.cur = len(l.items) - 1
+	idx := l.GetCurrentItem() + delta
+	if idx < 0 {
+		idx = 0
 	}
+	if idx >= count {
+		idx = count - 1
+	}
+	l.SetCurrentItem(idx)
 }
 
-func (l *ListAdapter) Current() int { return l.cur }
+func (l *ListAdapter) Current() int { return l.GetCurrentItem() }
 
 type HistoryAdapter struct {
-	items    []presentation.RunRow
-	scrolled bool
+	*tview.Table
 }
 
-func NewHistoryAdapter() *HistoryAdapter { return &HistoryAdapter{} }
+func NewHistoryAdapter() *HistoryAdapter {
+	tbl := tview.NewTable().SetFixed(1, 0)
+	return &HistoryAdapter{Table: tbl}
+}
 
-func (h *HistoryAdapter) SetItems(items []presentation.RunRow) { h.items = items }
-func (h *HistoryAdapter) ScrollToEnd()                         { h.scrolled = true }
+func (h *HistoryAdapter) SetItems(items []presentation.RunRow) {
+	h.Clear()
+	for row, it := range items {
+		h.SetCell(row, 0, tview.NewTableCell(it.Label))
+		h.SetCell(row, 1, tview.NewTableCell(string(it.Status)))
+		h.SetCell(row, 2, tview.NewTableCell(it.Duration))
+	}
+	if h.GetRowCount() > 0 {
+		h.Select(h.GetRowCount()-1, 0)
+	}
+}
+
+func (h *HistoryAdapter) ScrollToEnd() {
+	if rows := h.GetRowCount(); rows > 0 {
+		h.Select(rows-1, 0)
+		h.ScrollToBeginning() // move view; Select already highlights last
+	}
+}
 
 type LogAdapter struct {
-	lines []string
+	*tview.TextView
 }
 
-func NewLogAdapter() *LogAdapter { return &LogAdapter{} }
+func NewLogAdapter() *LogAdapter {
+	tv := tview.NewTextView().SetDynamicColors(true).SetScrollable(true)
+	return &LogAdapter{TextView: tv}
+}
 
-func (l *LogAdapter) Append(line string) { l.lines = append(l.lines, line) }
-func (l *LogAdapter) Clear()             { l.lines = nil }
-func (l *LogAdapter) ScrollToEnd()       {}
+func (l *LogAdapter) Append(line string) {
+	l.Write([]byte(line))
+	l.ScrollToEnd()
+}
+
+func (l *LogAdapter) Clear()       { l.TextView.Clear() }
+func (l *LogAdapter) ScrollToEnd() { l.TextView.ScrollToEnd() }
