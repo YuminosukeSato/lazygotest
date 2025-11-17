@@ -32,6 +32,16 @@ func TestRunCompleteFailure(t *testing.T) {
 	}
 }
 
+func TestRunDuration(t *testing.T) {
+	t.Parallel()
+	run := execution.NewRun("pkg", "TestFoo")
+	run.AddDuration(0.1)
+	run.AddDuration(-1) // ignored
+	if got := run.Duration(); got != 0.1 {
+		t.Fatalf("expected duration 0.1, got %f", got)
+	}
+}
+
 func assertErr(msg string) error {
 	return &testError{msg: msg}
 }

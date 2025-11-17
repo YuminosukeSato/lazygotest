@@ -24,8 +24,9 @@ type TestEvent struct {
 }
 
 type TestResult struct {
-	Status RunStatus
-	Events []TestEvent
+	Status   RunStatus
+	Events   []TestEvent
+	Duration float64
 }
 
 type GoTestRunner struct {
@@ -49,6 +50,7 @@ func (g GoTestRunner) Run(ctx context.Context, importPath, testName string) (Tes
 	dec := json.NewDecoder(strings.NewReader(out))
 	events := make([]TestEvent, 0, 16)
 	status := RunStatusPass
+	totalElapsed := 0.0
 	for dec.More() {
 		var ev TestEvent
 		if err := dec.Decode(&ev); err != nil {
@@ -56,11 +58,15 @@ func (g GoTestRunner) Run(ctx context.Context, importPath, testName string) (Tes
 		}
 		ev.Output = strings.ReplaceAll(ev.Output, "\\n", "\n")
 		events = append(events, ev)
+		if ev.Elapsed > 0 {
+			totalElapsed += ev.Elapsed
+		}
 		status = nextStatus(status, ev.Action)
 	}
 	return TestResult{
-		Status: status,
-		Events: events,
+		Status:   status,
+		Events:   events,
+		Duration: totalElapsed,
 	}, nil
 }
 

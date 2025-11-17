@@ -33,6 +33,7 @@ func (s Service) Run(ctx context.Context, importPath, testName string) (executio
 			run.AppendLog(ev.Output)
 		}
 	}
+	run.AddDuration(res.Duration)
 	switch res.Status {
 	case process.RunStatusPass:
 		run.Complete(nil)

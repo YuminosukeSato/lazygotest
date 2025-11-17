@@ -14,7 +14,7 @@ func TestGoTestRunnerParsesJSONStream(t *testing.T) {
 		`{"Time":"2024-01-01T00:00:00Z","Action":"run","Package":"github.com/me/a","Test":"TestFoo"}`,
 		`{"Time":"2024-01-01T00:00:00Z","Action":"output","Package":"github.com/me/a","Test":"TestFoo","Output":"hello\\n"}`,
 		`{"Time":"2024-01-01T00:00:01Z","Action":"pass","Package":"github.com/me/a","Test":"TestFoo","Elapsed":0.1}`,
-		`{"Time":"2024-01-01T00:00:01Z","Action":"pass","Package":"github.com/me/a","Elapsed":0.1}`,
+		`{"Time":"2024-01-01T00:00:01Z","Action":"pass","Package":"github.com/me/a","Elapsed":0.2}`,
 	}, "\n")
 	runner := &fakeRunner{outputs: []string{stream}}
 	rt := process.NewGoTestRunner(runner)
@@ -31,6 +31,9 @@ func TestGoTestRunnerParsesJSONStream(t *testing.T) {
 	}
 	if got := result.Events[1].Output; got != "hello\n" {
 		t.Fatalf("expected output preserved, got %q", got)
+	}
+	if diff := result.Duration - 0.3; diff < -1e-9 || diff > 1e-9 {
+		t.Fatalf("expected duration 0.3, got %f", result.Duration)
 	}
 }
 

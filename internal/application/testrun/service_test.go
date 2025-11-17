@@ -31,7 +31,8 @@ func TestServiceSuccessPopulatesLogsAndStatus(t *testing.T) {
 	t.Parallel()
 	runner := &fakeRunner{
 		result: process.TestResult{
-			Status: process.RunStatusPass,
+			Status:   process.RunStatusPass,
+			Duration: 0.3,
 			Events: []process.TestEvent{
 				{Action: "run", Test: "TestFoo"},
 				{Action: "output", Output: "hello\n"},
@@ -53,6 +54,9 @@ func TestServiceSuccessPopulatesLogsAndStatus(t *testing.T) {
 	}
 	if got := runner.calls[0].testName; got != "TestFoo" {
 		t.Fatalf("expected test name forwarded, got %s", got)
+	}
+	if run.Duration() != 0.3 {
+		t.Fatalf("expected duration 0.3, got %f", run.Duration())
 	}
 }
 
