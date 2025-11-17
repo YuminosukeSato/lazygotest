@@ -157,3 +157,20 @@ func TestAppRerunLast(t *testing.T) {
 		t.Fatalf("expected history set")
 	}
 }
+
+func TestApplyFilterReducesTests(t *testing.T) {
+	t.Parallel()
+	tree := &fakeTree{}
+	list := &fakeList{}
+	hist := &fakeHistory{}
+	logView := &fakeLog{}
+	runner := testrun.NewService(&fakeRunner{res: process.TestResult{Status: process.RunStatusPass}})
+	app := ui.NewApp(tree, list, hist, logView, runner)
+	app.SetSnapshot(buildSnapshot(t, "pkg", []string{"TestFoo", "TestBar"}), nil)
+
+	app.ApplyFilter("Foo")
+
+	if len(list.items) != 1 || list.items[0].Name != "TestFoo" {
+		t.Fatalf("expected only TestFoo after filter, got %v", list.items)
+	}
+}

@@ -3,6 +3,7 @@ package ui
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/s21066/lazygotest/internal/application/testrun"
 	"github.com/s21066/lazygotest/internal/domain/catalog"
@@ -46,6 +47,7 @@ type App struct {
 	vm       presentation.ViewModel
 	runs     []execution.Run
 	runner   testrun.Service
+	filter   string
 }
 
 func NewApp(tree TreeView, tests ListView, history HistoryView, log LogView, runner testrun.Service) *App {
@@ -96,7 +98,8 @@ func (a *App) HandleKey(key string) bool {
 		_ = a.rerunLast()
 		return true
 	case "/":
-		a.log.Append("filter: (not implemented)")
+		a.ApplyFilter("")
+		a.log.Append("filter reset")
 		return true
 	case "q":
 		// caller decides to quit
@@ -159,6 +162,21 @@ func (a *App) refreshRuns() {
 	vm := presentation.Project(a.snapshot, a.runs)
 	a.history.SetItems(vm.Runs)
 	a.history.ScrollToEnd()
+}
+
+func (a *App) ApplyFilter(term string) {
+	a.filter = term
+	if term == "" {
+		a.tests.SetItems(a.vm.Tests)
+		return
+	}
+	filtered := make([]presentation.TestRow, 0, len(a.vm.Tests))
+	for _, tr := range a.vm.Tests {
+		if strings.Contains(tr.Name, term) {
+			filtered = append(filtered, tr)
+		}
+	}
+	a.tests.SetItems(filtered)
 }
 
 // Runs returns a copy of run history (primarily for tests).

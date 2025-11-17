@@ -11,7 +11,9 @@ Command-line helpers to catalog and run Go tests in a TDD-friendly way.
 ## Usage
 1. Run `./scripts/check.sh` (defaults to PROFILE=unit).  
    - `PROFILE=race` adds `-race`, `PROFILE=cover` adds `-cover`, `PROFILE=short` adds `-short`, `RUN=TestName` adds `-run ^TestName$`.
-2. Integrate `internal/interfaces/process` adapters into your TUI or CLI.
+2. Start the headless UI stub: `go run ./cmd`. (It wires adapters; real tview primitives can be swapped easily.)
+3. Keymap (vim-like, simple English): `h/j/k/l` move, `gg`/`G` top/bottom, `Enter` run selection, `r` rerun last, `/` reset filter, `Tab`/`Shift-Tab` move focus, `?` help (placeholder), `q` quit (caller handles exit).
+4. Adapters: `internal/ui/tview_adapter.go` provides minimal implementations of Tree/List/History/Log panes; replace with tview primitives in production.
 
 ## Development
 - Follow TDD: add a failing test, implement the minimum, then refactor.
