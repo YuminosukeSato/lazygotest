@@ -1,3 +1,5 @@
+//go:build !tview
+
 package ui
 
 import "github.com/s21066/lazygotest/internal/presentation"
