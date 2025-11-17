@@ -17,8 +17,7 @@ func main() {
 	history := ui.NewHistoryAdapter()
 	logview := ui.NewLogAdapter()
 
-	// runner backed by GoTestRunner; here we use a no-op runner adapter requiring a CmdRunner implementation.
-	noopRunner := process.NewGoTestRunner(&process.InMemoryRunner{})
+	noopRunner := process.NewGoTestRunner(process.NewNoopCmdRunner())
 	app := ui.NewApp(tree, list, history, logview, testrun.NewService(noopRunner))
 	app.SetSnapshot(catalog.NewSnapshot(nil), nil)
 

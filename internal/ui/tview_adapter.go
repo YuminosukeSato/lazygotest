@@ -2,8 +2,7 @@ package ui
 
 import "github.com/s21066/lazygotest/internal/presentation"
 
-// NOTE: This is a thin, tview-like adapter implemented locally to keep tests and builds
-// working in offline environments. It satisfies the pane interfaces used by App.
+// NOTE: This is a thin local adapter for offline builds (no external deps).
 
 type TreeAdapter struct {
 	items []presentation.PackageNode
