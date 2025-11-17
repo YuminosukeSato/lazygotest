@@ -14,6 +14,7 @@ Command-line helpers to catalog and run Go tests in a TDD-friendly way.
 2. Start the headless UI stub: `go run ./cmd`. (It wires adapters; real tview primitives can be swapped easily.)
 3. Keymap (vim-like, simple English): `h/j/k/l` move, `gg`/`G` top/bottom, `Enter` run selection, `r` rerun last, `/` reset filter, `Tab`/`Shift-Tab` move focus, `?` help (placeholder), `q` quit (caller handles exit).
 4. Adapters: `internal/ui/tview_adapter.go` provides minimal implementations of Tree/List/History/Log panes; replace with tview primitives in production.
+5. tview build: `go run -tags tview ./cmd` uses real tview primitives (requires module `github.com/rivo/tview`). `/` opens a filter modal, `?` opens a help overlay.
 
 ## Development
 - Follow TDD: add a failing test, implement the minimum, then refactor.

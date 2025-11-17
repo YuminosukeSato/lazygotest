@@ -50,16 +50,24 @@ type App struct {
 	runner   testrun.Service
 	filter   string
 	helpOpen bool
+	filterUI func(apply func(string))
+	helpUI   func()
 }
 
-func NewApp(tree TreeView, tests ListView, history HistoryView, log LogView, runner testrun.Service) *App {
-	return &App{
+type Option func(*App)
+
+func NewApp(tree TreeView, tests ListView, history HistoryView, log LogView, runner testrun.Service, opts ...Option) *App {
+	app := &App{
 		tree:    tree,
 		tests:   tests,
 		history: history,
 		log:     log,
 		runner:  runner,
 	}
+	for _, opt := range opts {
+		opt(app)
+	}
+	return app
 }
 
 func (a *App) SetSnapshot(snapshot catalog.Snapshot, runs []execution.Run) {
@@ -184,13 +192,21 @@ func (a *App) ApplyFilter(term string) {
 }
 
 func (a *App) filterPrompt() {
-	// headless placeholder: just clear filter; real UI should open input modal
+	if a.filterUI != nil {
+		a.filterUI(a.ApplyFilter)
+		return
+	}
+	// fallback headless behavior
 	a.ApplyFilter("")
 	a.log.Append("filter: cleared")
 	a.log.ScrollToEnd()
 }
 
 func (a *App) toggleHelp() {
+	if a.helpUI != nil {
+		a.helpUI()
+		return
+	}
 	a.helpOpen = !a.helpOpen
 	if a.helpOpen {
 		a.log.Append("keys: h/j/k/l gg/G Enter r / ? q")

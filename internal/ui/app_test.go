@@ -175,3 +175,18 @@ func TestApplyFilterReducesTests(t *testing.T) {
 		t.Fatalf("expected only TestFoo after filter, got %v", list.items)
 	}
 }
+
+func TestHandleHelpHook(t *testing.T) {
+	t.Parallel()
+	tree := &fakeTree{}
+	list := &fakeList{}
+	hist := &fakeHistory{}
+	log := &fakeLog{}
+	called := false
+	runner := testrun.NewService(&fakeRunner{res: process.TestResult{Status: process.RunStatusPass}})
+	app := ui.NewApp(tree, list, hist, log, runner, ui.WithHelpUI(func() { called = true }))
+	app.HandleKey("?")
+	if !called {
+		t.Fatalf("expected help hook called")
+	}
+}
