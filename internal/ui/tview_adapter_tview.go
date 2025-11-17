@@ -32,11 +32,17 @@ func (t *TreeAdapter) Move(delta int) {
 	}
 	parent := cur.GetParent()
 	if parent == nil {
-		return
+		parent = t.GetRoot()
 	}
 	siblings := parent.GetChildren()
-	idx := indexOfNode(siblings, cur)
-	if idx < 0 {
+	idx := -1
+	for i, n := range siblings {
+		if n == cur {
+			idx = i
+			break
+		}
+	}
+	if idx == -1 {
 		return
 	}
 	idx += delta
@@ -110,8 +116,10 @@ func (h *HistoryAdapter) SetItems(items []presentation.RunRow) {
 }
 
 func (h *HistoryAdapter) ScrollToEnd() {
-	if h.GetRowCount() > 0 {
-		h.ScrollToEnd()
+	// tview Table lacks direct ScrollToEnd; emulate by scrolling to last row.
+	if rows := h.GetRowCount(); rows > 0 {
+		h.Select(rows-1, 0)
+		h.ScrollTo(rows-1, 0)
 	}
 }
 
