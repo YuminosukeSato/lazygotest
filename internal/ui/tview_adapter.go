@@ -1,7 +1,12 @@
+//go:build tview
+
 package ui
 
 import (
+	"fmt"
+
 	"github.com/rivo/tview"
+	"github.com/s21066/lazygotest/internal/domain/execution"
 	"github.com/s21066/lazygotest/internal/presentation"
 )
 
@@ -10,11 +15,17 @@ type TreeAdapter struct {
 	*tview.TreeView
 	nodes   []*tview.TreeNode
 	current int
+	theme   Theme
 }
 
 func NewTreeAdapter() *TreeAdapter {
+	theme := DefaultTheme()
 	tv := tview.NewTreeView()
-	return &TreeAdapter{TreeView: tv, current: 0}
+	tv.SetBorder(true).
+		SetTitle(" Packages ").
+		SetTitleAlign(tview.AlignLeft).
+		SetBorderColor(theme.BorderNormal)
+	return &TreeAdapter{TreeView: tv, current: 0, theme: theme}
 }
 
 func (t *TreeAdapter) SetItems(items []presentation.PackageNode) {
@@ -48,18 +59,42 @@ func (t *TreeAdapter) Move(delta int) {
 
 func (t *TreeAdapter) Current() int { return t.current }
 
+func (t *TreeAdapter) SetFocus(focused bool) {
+	if focused {
+		t.SetBorderColor(t.theme.BorderFocus)
+	} else {
+		t.SetBorderColor(t.theme.BorderNormal)
+	}
+}
+
 type ListAdapter struct {
 	*tview.List
+	theme Theme
 }
 
 func NewListAdapter() *ListAdapter {
-	return &ListAdapter{List: tview.NewList()}
+	theme := DefaultTheme()
+	list := tview.NewList()
+	list.SetBorder(true).
+		SetTitle(" Tests ").
+		SetTitleAlign(tview.AlignLeft).
+		SetBorderColor(theme.BorderNormal)
+	return &ListAdapter{List: list, theme: theme}
 }
 
 func (l *ListAdapter) SetItems(items []presentation.TestRow) {
 	l.Clear()
 	for _, it := range items {
-		l.AddItem(it.Name, string(it.Kind), 0, nil)
+		icon := string(IconPending)
+		l.AddItem(fmt.Sprintf("%s %s", icon, it.Name), string(it.Kind), 0, nil)
+	}
+}
+
+func (l *ListAdapter) SetFocus(focused bool) {
+	if focused {
+		l.SetBorderColor(l.theme.BorderFocus)
+	} else {
+		l.SetBorderColor(l.theme.BorderNormal)
 	}
 }
 
@@ -82,22 +117,51 @@ func (l *ListAdapter) Current() int { return l.GetCurrentItem() }
 
 type HistoryAdapter struct {
 	*tview.Table
+	theme Theme
 }
 
 func NewHistoryAdapter() *HistoryAdapter {
+	theme := DefaultTheme()
 	tbl := tview.NewTable().SetFixed(1, 0)
-	return &HistoryAdapter{Table: tbl}
+	tbl.SetBorder(true).
+		SetTitle(" History ").
+		SetTitleAlign(tview.AlignLeft).
+		SetBorderColor(theme.BorderNormal)
+	return &HistoryAdapter{Table: tbl, theme: theme}
 }
 
 func (h *HistoryAdapter) SetItems(items []presentation.RunRow) {
 	h.Clear()
 	for row, it := range items {
-		h.SetCell(row, 0, tview.NewTableCell(it.Label))
+		icon := h.getStatusIcon(it.Status)
+		label := fmt.Sprintf("%s %s", icon, it.Label)
+		h.SetCell(row, 0, tview.NewTableCell(label))
 		h.SetCell(row, 1, tview.NewTableCell(string(it.Status)))
 		h.SetCell(row, 2, tview.NewTableCell(it.Duration))
 	}
 	if h.GetRowCount() > 0 {
 		h.Select(h.GetRowCount()-1, 0)
+	}
+}
+
+func (h *HistoryAdapter) getStatusIcon(status execution.Status) string {
+	switch status {
+	case execution.StatusSuccess:
+		return string(IconPass)
+	case execution.StatusFailed:
+		return string(IconFail)
+	case execution.StatusRunning:
+		return string(IconRunning)
+	default:
+		return string(IconPending)
+	}
+}
+
+func (h *HistoryAdapter) SetFocus(focused bool) {
+	if focused {
+		h.SetBorderColor(h.theme.BorderFocus)
+	} else {
+		h.SetBorderColor(h.theme.BorderNormal)
 	}
 }
 
@@ -109,16 +173,30 @@ func (h *HistoryAdapter) ScrollToEnd() {
 
 type LogAdapter struct {
 	*tview.TextView
+	theme Theme
 }
 
 func NewLogAdapter() *LogAdapter {
+	theme := DefaultTheme()
 	tv := tview.NewTextView().SetDynamicColors(true).SetScrollable(true)
-	return &LogAdapter{TextView: tv}
+	tv.SetBorder(true).
+		SetTitle(" Log ").
+		SetTitleAlign(tview.AlignLeft).
+		SetBorderColor(theme.BorderNormal)
+	return &LogAdapter{TextView: tv, theme: theme}
 }
 
 func (l *LogAdapter) Append(line string) {
 	_, _ = l.Write([]byte(line))
 	l.ScrollToEnd()
+}
+
+func (l *LogAdapter) SetFocus(focused bool) {
+	if focused {
+		l.SetBorderColor(l.theme.BorderFocus)
+	} else {
+		l.SetBorderColor(l.theme.BorderNormal)
+	}
 }
 
 func (l *LogAdapter) Clear()       { l.TextView.Clear() }

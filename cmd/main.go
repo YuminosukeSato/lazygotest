@@ -1,4 +1,4 @@
-//go:build !tview
+//go:build !tview && ignore
 
 package main
 
