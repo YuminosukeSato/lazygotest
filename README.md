@@ -75,11 +75,40 @@ lazygotest .
 lazygotest /path/to/your/project
 ```
 
-The TUI will launch and display:
-- **Packages pane** (left) - All test packages in your project
-- **Tests pane** (top right) - Individual tests in the selected package
-- **History pane** (middle right) - Recent test runs with status
-- **Log pane** (bottom right) - Real-time test output
+## Usage
+
+### TUI Interface
+
+![lazygotest TUI](docs/images/tui-screenshot.png)
+
+The TUI provides a comprehensive 4-pane layout for efficient test navigation and execution:
+
+- **Packages pane** (left) - Browse all test packages in your project with folder hierarchy
+- **Tests pane** (top right) - View individual test functions in the selected package
+- **History pane** (middle right) - Track recent test executions with real-time status updates
+- **Log pane** (bottom) - Monitor detailed test output, stack traces, and error messages
+
+The bottom status bar displays context-sensitive keyboard shortcuts for quick reference.
+
+### Basic Workflow
+
+1. **Navigate packages** - Use `↑↓` or `j/k` to browse the Packages pane
+2. **Select a package** - Press `Enter` or move to Tests pane with `Tab` or `→`
+3. **Choose a test** - Navigate the Tests pane to find your target test
+4. **Run test** - Press `Enter` to execute (watch results in History and Log panes)
+5. **Review output** - Check the Log pane for detailed execution information
+6. **Rerun if needed** - Press `r` to quickly rerun the last test
+
+### Status Indicators
+
+Each test displays a visual status icon for quick identification:
+
+- `○` **Pending** - Test has not been run yet
+- `⏳` **Running** - Test is currently executing
+- `✓` **Pass** - Test completed successfully (green)
+- `✗` **Fail** - Test failed with errors (red)
+
+The currently focused pane is highlighted with a bright blue border for clear visual feedback.
 
 ## Keyboard Shortcuts
 

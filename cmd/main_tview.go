@@ -6,12 +6,12 @@ import (
 	"context"
 	"log"
 
-	"github.com/gdamore/tcell/v2"
-	"github.com/rivo/tview"
 	"github.com/YuminosukeSato/lazygotest/internal/application/catalogsync"
 	"github.com/YuminosukeSato/lazygotest/internal/application/testrun"
 	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
 	"github.com/YuminosukeSato/lazygotest/internal/ui"
+	"github.com/gdamore/tcell/v2"
+	"github.com/rivo/tview"
 )
 
 func main() {

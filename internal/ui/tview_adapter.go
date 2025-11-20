@@ -5,9 +5,9 @@ package ui
 import (
 	"fmt"
 
-	"github.com/rivo/tview"
 	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
 	"github.com/YuminosukeSato/lazygotest/internal/presentation"
+	"github.com/rivo/tview"
 )
 
 // TreeAdapter wraps tview.TreeView and keeps index-based selection.
