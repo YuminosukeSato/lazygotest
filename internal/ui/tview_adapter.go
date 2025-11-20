@@ -6,8 +6,8 @@ import (
 	"fmt"
 
 	"github.com/rivo/tview"
-	"github.com/s21066/lazygotest/internal/domain/execution"
-	"github.com/s21066/lazygotest/internal/presentation"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
+	"github.com/YuminosukeSato/lazygotest/internal/presentation"
 )
 
 // TreeAdapter wraps tview.TreeView and keeps index-based selection.

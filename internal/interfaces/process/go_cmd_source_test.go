@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/domain/catalog"
-	"github.com/s21066/lazygotest/internal/interfaces/process"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
 )
 
 type fakeRunner struct {

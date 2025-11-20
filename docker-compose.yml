@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  lazygotest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lazygotest:latest
+    container_name: lazygotest
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mount your Go project directory here
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - TERM=xterm-256color

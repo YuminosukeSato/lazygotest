@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/interfaces/process"
+	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
 )
 
 func TestGoTestRunnerParsesJSONStream(t *testing.T) {

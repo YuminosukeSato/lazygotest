@@ -1,6 +1,6 @@
-module github.com/s21066/lazygotest
+module github.com/YuminosukeSato/lazygotest
 
-go 1.22.0
+go 1.25
 
 require (
 	github.com/gdamore/tcell/v2 v2.8.1

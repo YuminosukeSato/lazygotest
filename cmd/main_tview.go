@@ -8,10 +8,10 @@ import (
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"github.com/s21066/lazygotest/internal/application/catalogsync"
-	"github.com/s21066/lazygotest/internal/application/testrun"
-	"github.com/s21066/lazygotest/internal/interfaces/process"
-	"github.com/s21066/lazygotest/internal/ui"
+	"github.com/YuminosukeSato/lazygotest/internal/application/catalogsync"
+	"github.com/YuminosukeSato/lazygotest/internal/application/testrun"
+	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
+	"github.com/YuminosukeSato/lazygotest/internal/ui"
 )
 
 func main() {

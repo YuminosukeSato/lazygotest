@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/application/testrun"
-	"github.com/s21066/lazygotest/internal/domain/execution"
-	"github.com/s21066/lazygotest/internal/interfaces/process"
+	"github.com/YuminosukeSato/lazygotest/internal/application/testrun"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
+	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
 )
 
 type fakeRunner struct {

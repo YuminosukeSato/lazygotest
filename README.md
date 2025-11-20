@@ -2,7 +2,7 @@
 
 A beautiful terminal UI for running Go tests interactively, inspired by lazygit.
 
-![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)
+![Go Version](https://img.shields.io/badge/Go-1.25+-00ADD8?style=flat&logo=go)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 ## Overview
@@ -36,9 +36,33 @@ make install
 
 ## Requirements
 
-- Go 1.21 or higher
+- Go 1.25 or higher
 - Interactive terminal with TTY support
 - Unix-like environment (macOS, Linux, WSL)
+
+## Docker Usage
+
+### Using Docker
+
+```bash
+# Build the Docker image
+docker build -t lazygotest .
+
+# Run with Docker (interactive TTY required)
+docker run -it --rm -v $(pwd):/workspace -w /workspace lazygotest
+```
+
+### Using Docker Compose
+
+```bash
+# Build and run with docker-compose
+docker-compose run --rm lazygotest
+
+# Or run in a specific directory
+docker-compose run --rm lazygotest /path/to/project
+```
+
+**Note:** Docker usage requires mounting your Go project directory as a volume to analyze and run tests.
 
 ## Quick Start
 

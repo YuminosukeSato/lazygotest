@@ -5,10 +5,10 @@ package main
 import (
 	"log"
 
-	"github.com/s21066/lazygotest/internal/application/testrun"
-	"github.com/s21066/lazygotest/internal/domain/catalog"
-	"github.com/s21066/lazygotest/internal/interfaces/process"
-	"github.com/s21066/lazygotest/internal/ui"
+	"github.com/YuminosukeSato/lazygotest/internal/application/testrun"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
+	"github.com/YuminosukeSato/lazygotest/internal/ui"
 )
 
 // entry point placeholder: in a fully featured app this would set up tview primitives.

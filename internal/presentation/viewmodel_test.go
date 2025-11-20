@@ -3,9 +3,9 @@ package presentation_test
 import (
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/domain/catalog"
-	"github.com/s21066/lazygotest/internal/domain/execution"
-	"github.com/s21066/lazygotest/internal/presentation"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
+	"github.com/YuminosukeSato/lazygotest/internal/presentation"
 )
 
 func TestProjectBuildsThreePanes(t *testing.T) {

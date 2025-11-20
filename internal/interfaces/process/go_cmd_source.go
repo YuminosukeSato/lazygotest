@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/s21066/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
 )
 
 // CmdRunner は外部プロセス実行を抽象化する。

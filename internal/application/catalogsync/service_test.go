@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/application/catalogsync"
-	"github.com/s21066/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/application/catalogsync"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
 )
 
 type fakeSource struct {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/application/testrun"
-	"github.com/s21066/lazygotest/internal/domain/catalog"
-	"github.com/s21066/lazygotest/internal/domain/execution"
-	"github.com/s21066/lazygotest/internal/interfaces/process"
-	"github.com/s21066/lazygotest/internal/presentation"
-	"github.com/s21066/lazygotest/internal/ui"
+	"github.com/YuminosukeSato/lazygotest/internal/application/testrun"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
+	"github.com/YuminosukeSato/lazygotest/internal/interfaces/process"
+	"github.com/YuminosukeSato/lazygotest/internal/presentation"
+	"github.com/YuminosukeSato/lazygotest/internal/ui"
 )
 
 type fakeTree struct {

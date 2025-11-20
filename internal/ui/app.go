@@ -5,10 +5,10 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/s21066/lazygotest/internal/application/testrun"
-	"github.com/s21066/lazygotest/internal/domain/catalog"
-	"github.com/s21066/lazygotest/internal/domain/execution"
-	"github.com/s21066/lazygotest/internal/presentation"
+	"github.com/YuminosukeSato/lazygotest/internal/application/testrun"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
+	"github.com/YuminosukeSato/lazygotest/internal/presentation"
 )
 
 // TreeView abstracts the package tree pane.

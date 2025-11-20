@@ -3,7 +3,7 @@ package execution_test
 import (
 	"testing"
 
-	"github.com/s21066/lazygotest/internal/domain/execution"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/execution"
 )
 
 func TestRunStartsAsRunning(t *testing.T) {

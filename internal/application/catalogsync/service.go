@@ -3,7 +3,7 @@ package catalogsync
 import (
 	"context"
 
-	"github.com/s21066/lazygotest/internal/domain/catalog"
+	"github.com/YuminosukeSato/lazygotest/internal/domain/catalog"
 )
 
 type Source interface {
