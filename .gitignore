@@ -1,0 +1,30 @@
+# Binaries
+bin/
+*.exe
+*.test
+*.out
+lazygotest
+main_tview
+
+# Build cache
+.cache/
+.gomodcache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+debug.log
+
+# Test coverage
+coverage.out
+*.prof
