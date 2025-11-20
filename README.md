@@ -23,7 +23,7 @@ A beautiful terminal UI for running Go tests interactively, inspired by lazygit.
 ### Via go install (Recommended)
 
 ```bash
-go install github.com/YuminosukeSato/lazygotest/cmd/lazygotest@latest
+go install -tags tview github.com/YuminosukeSato/lazygotest/cmd/lazygotest@latest
 ```
 
 ### From Source
