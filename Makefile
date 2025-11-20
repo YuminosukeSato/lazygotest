@@ -1,4 +1,4 @@
-.PHONY: all build test run clean lint fmt help
+.PHONY: all build test run clean lint fmt install help
 
 BIN_DIR := ./bin
 BIN_NAME := lazygotest
@@ -10,7 +10,7 @@ all: fmt lint test build
 build:
 	@echo "Building $(BIN_NAME)..."
 	@mkdir -p $(BIN_DIR)
-	go build $(GO_BUILD_FLAGS) -tags tview -o $(BIN_DIR)/$(BIN_NAME) ./cmd/main_tview.go
+	go build $(GO_BUILD_FLAGS) -tags tview -o $(BIN_DIR)/$(BIN_NAME) ./cmd/lazygotest
 
 test:
 	@echo "Running tests..."
@@ -18,7 +18,11 @@ test:
 
 test-tview:
 	@echo "Running tview tests..."
-	go test -tags tview ./cmd -v -timeout 10s
+	go test -tags tview ./cmd/... -v -timeout 10s
+
+install:
+	@echo "Installing $(BIN_NAME)..."
+	go install -tags tview ./cmd/lazygotest
 
 run: build
 	@echo "Running $(BIN_NAME)..."
@@ -49,6 +53,7 @@ help:
 	@echo "  test       - Run all tests"
 	@echo "  test-tview - Run tview-specific tests"
 	@echo "  run        - Build and run the application"
+	@echo "  install    - Install lazygotest to \$$GOPATH/bin"
 	@echo "  clean      - Remove build artifacts and cache"
 	@echo "  lint       - Run golangci-lint"
 	@echo "  fmt        - Format code with go fmt"

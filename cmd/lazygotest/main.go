@@ -4,7 +4,11 @@ package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -15,6 +19,43 @@ import (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [path]\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\nA TUI for running Go tests interactively.\n\n")
+		fmt.Fprintf(os.Stderr, "Arguments:\n")
+		fmt.Fprintf(os.Stderr, "  path    Directory containing go.mod (default: search from current directory)\n")
+		fmt.Fprintf(os.Stderr, "\nExamples:\n")
+		fmt.Fprintf(os.Stderr, "  %s          # Search for go.mod in current and parent directories\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s .        # Use current directory\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "  %s /path    # Use specific directory\n", os.Args[0])
+	}
+	flag.Parse()
+
+	targetDir := "."
+	if flag.NArg() > 0 {
+		targetDir = flag.Arg(0)
+	} else {
+		wd, err := os.Getwd()
+		if err != nil {
+			log.Fatalf("get working directory: %v", err)
+		}
+		found, err := findGoMod(wd)
+		if err != nil {
+			log.Printf("warning: %v, using current directory", err)
+		} else {
+			targetDir = found
+		}
+	}
+
+	absPath, err := filepath.Abs(targetDir)
+	if err != nil {
+		log.Fatalf("resolve path: %v", err)
+	}
+
+	if _, err := os.Stat(filepath.Join(absPath, "go.mod")); err != nil {
+		log.Fatalf("go.mod not found in %s", absPath)
+	}
+
 	app := tview.NewApplication()
 
 	theme := ui.DefaultTheme()
@@ -26,7 +67,6 @@ func main() {
 
 	pages := tview.NewPages()
 
-	// Wire filter/help handlers using tview modals.
 	filterUI := func(apply func(string)) {
 		inField := tview.NewInputField()
 		inField.SetLabel("Filter: ").SetDoneFunc(func(key tcell.Key) {
@@ -52,7 +92,7 @@ func main() {
 
 	helpUI := func() {
 		text := "[yellow]Keys[-]\n" +
-			"h/j/k/l move, gg/G top/bottom, Enter run, r rerun, / filter, ? help, Tab/Shift-Tab focus, q quit"
+			"↑↓/jk move, gg/G top/bottom, Enter run, r rerun, / filter, ? help, Tab/Shift-Tab focus, q quit"
 		tv := tview.NewTextView().SetDynamicColors(true).SetText(text)
 		modal := tview.NewModal().
 			AddButtons([]string{"Close"}).
@@ -67,7 +107,7 @@ func main() {
 	}
 
 	goRunner := process.NewOSRunner()
-	src := process.NewGoCmdSource(".", goRunner)
+	src := process.NewGoCmdSource(absPath, goRunner)
 	modules, err := src.Modules(context.Background())
 	if err != nil {
 		log.Fatalf("catalog: %v", err)
@@ -79,7 +119,6 @@ func main() {
 	uiApp := ui.NewApp(tree, list, hist, logView, appSvc, ui.WithFilterUI(filterUI), ui.WithHelpUI(helpUI))
 	uiApp.SetSnapshot(snap, nil)
 
-	// layout
 	cols := tview.NewFlex().
 		AddItem(tree, 0, 1, true).
 		AddItem(list, 0, 1, false).
@@ -127,22 +166,34 @@ func main() {
 		return ev
 	})
 
-	// Prefer real screen; if unavailable (e.g., no /dev/tty), fall back to simulation to avoid hard failure.
 	screen, err := tcell.NewScreen()
 	if err != nil {
-		log.Printf("warning: real screen unavailable (%v), falling back to simulation screen", err)
-		screen = tcell.NewSimulationScreen("")
+		log.Fatalf("create screen: %v", err)
 	}
 	if err := screen.Init(); err != nil {
-		log.Printf("warning: screen init failed (%v), using simulation screen", err)
-		screen = tcell.NewSimulationScreen("")
-		if err := screen.Init(); err != nil {
-			log.Fatalf("initialize screen: %v", err)
-		}
+		log.Fatalf("initialize screen: %v", err)
 	}
 	app.SetScreen(screen)
 
 	if err := app.SetRoot(pages, true).EnableMouse(true).Run(); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func findGoMod(startDir string) (string, error) {
+	dir, err := filepath.Abs(startDir)
+	if err != nil {
+		return "", fmt.Errorf("resolve path: %w", err)
+	}
+
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fmt.Errorf("go.mod not found")
+		}
+		dir = parent
 	}
 }
