@@ -1,52 +1,135 @@
 # lazygotest
 
-A beautiful TUI for running Go tests interactively, inspired by lazygit.
+A beautiful terminal UI for running Go tests interactively, inspired by lazygit.
+
+![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
+## Overview
+
+`lazygotest` brings the joy of lazygit's user experience to Go testing. Navigate your test suites with vim-style keybindings, see real-time results with beautiful color-coded output, and enjoy an accessible interface designed with universal design principles.
 
 ## Features
-- **lazygit-inspired color scheme** - Easy on the eyes with WCAG-compliant contrast
-- **Smart directory detection** - Auto-finds go.mod in parent directories
-- **Interactive test runner** - Browse and run tests with vim-style keybindings
-- **Real-time feedback** - See test results and logs as they happen
-- **Accessible design** - Color-blind friendly with icons and clear focus indicators
+
+- **lazygit-inspired color scheme** - Soothing Catppuccin Mocha theme with WCAG-compliant contrast
+- **Smart directory detection** - Automatically finds `go.mod` by walking up parent directories
+- **Interactive test runner** - Browse packages and tests with intuitive vim-style navigation
+- **Real-time feedback** - Watch test results and logs stream in as they happen
+- **Universal design** - Fully accessible with color-blind friendly icons and clear focus indicators
+- **Terminal compatibility** - Works seamlessly with iTerm2, Warp, Alacritty, kitty, and more
 
 ## Installation
 
-### Via go install (recommended)
+### Via go install (Recommended)
 
 ```bash
-go install github.com/s21066/lazygotest/cmd/lazygotest@latest
+go install github.com/YuminosukeSato/lazygotest/cmd/lazygotest@latest
 ```
 
-### From source
+### From Source
 
 ```bash
-git clone https://github.com/s21066/lazygotest.git
+git clone https://github.com/YuminosukeSato/lazygotest.git
 cd lazygotest
 make install
 ```
 
+## Requirements
+
+- Go 1.21 or higher
+- Interactive terminal with TTY support
+- Unix-like environment (macOS, Linux, WSL)
+
 ## Quick Start
 
 ```bash
-# Run in current directory (searches for go.mod in parents)
+# Run in current directory (auto-detects go.mod)
 lazygotest
 
 # Run in specific directory
 lazygotest .
-lazygotest /path/to/project
+lazygotest /path/to/your/project
 ```
 
-### For Development
+The TUI will launch and display:
+- **Packages pane** (left) - All test packages in your project
+- **Tests pane** (top right) - Individual tests in the selected package
+- **History pane** (middle right) - Recent test runs with status
+- **Log pane** (bottom right) - Real-time test output
+
+## Keyboard Shortcuts
+
+### Navigation
+- `↑↓` or `j/k` - Move up/down in current pane
+- `←→` or `h/l` - Switch between panes
+- `gg` / `G` - Jump to top/bottom
+- `Tab` / `Shift-Tab` - Cycle focus between panes
+
+### Actions
+- `Enter` - Run selected test or package
+- `r` - Rerun last test
+- `/` - Open filter dialog
+- `?` - Show help
+- `q` or `Esc` - Quit application
+
+### Visual Feedback
+- **Focused pane** - Bright blue border (RGB: 137, 180, 250)
+- **Test status icons** - ✓ (pass), ✗ (fail), ⏳ (running), ○ (pending)
+- **Status bar** - Context-sensitive key bindings at bottom
+
+## Theme and Accessibility
+
+### Catppuccin Mocha Color Palette
+
+The color scheme is carefully chosen for both aesthetics and accessibility:
+
+- **Background** - Deep navy (#1e1e2e) for reduced eye strain
+- **Text** - Soft lavender (#cdd6f4) with 4.5:1+ contrast ratio
+- **Success** - Mint green (#a6e3a1)
+- **Failure** - Rose pink (#f38ba8)
+- **Running** - Warm yellow (#f9e2af)
+- **Focus border** - Sky blue (#89b4fa)
+
+### Universal Design Features
+
+- **WCAG 2.1 AA compliant** - All text meets minimum 4.5:1 contrast ratio
+- **Icons + colors** - Status conveyed through both visual channels for color-blind users
+- **Clear focus indicators** - Always know which pane is active
+- **Multiple input methods** - Arrow keys and vim-style keybindings both supported
+- **Titled panes** - Each section clearly labeled for screen readers
+
+### Terminal Compatibility
+
+| Terminal | Status |
+|----------|--------|
+| macOS Terminal.app | ✅ Supported |
+| iTerm2 | ✅ Supported |
+| Warp | ✅ Supported |
+| Alacritty | ✅ Supported |
+| kitty | ✅ Supported |
+| tmux | ✅ Supported |
+| CI/CD environments | ⚠️ Requires TTY |
+
+## Development
+
+### Building from Source
 
 ```bash
-# Build the application
+# Build binary to ./bin/lazygotest
 make build
 
-# Run the TUI application (requires interactive terminal)
-make run
+# Run all tests
+make test
 
-# Or run directly
-./bin/lazygotest
+# Run tview-specific tests
+make test-tview
+
+# Run linter and formatter
+make lint
+make fmt
+
+# Full check (format, lint, test, build)
+make all
 ```
 
 ### Available Make Targets
@@ -57,64 +140,79 @@ make build       # Build the binary
 make test        # Run all tests
 make test-tview  # Run tview-specific tests
 make run         # Build and run the application
-make install     # Install lazygotest to $GOPATH/bin
-make clean       # Remove build artifacts and cache
+make install     # Install to $GOPATH/bin
+make clean       # Remove build artifacts
 make lint        # Run golangci-lint
-make fmt         # Format code
-make all         # Format, lint, test, and build
+make fmt         # Format code with gofmt
+make all         # Full pipeline (default)
 ```
 
-## TUI Features
+### Project Structure
 
-### lazygit-inspired Theme
-- **Catppuccin Mocha colors** - Soothing dark theme with excellent contrast
-- **Soft pastels** - Easy on the eyes during long coding sessions
-- **Consistent color language** - Success/failure/running states use distinct, recognizable colors
+```
+lazygotest/
+├── cmd/
+│   ├── lazygotest/        # Main CLI entry point
+│   └── main_tview.go      # TUI application with tview
+├── internal/
+│   ├── application/       # Application layer (use cases)
+│   ├── domain/           # Domain layer (business logic)
+│   ├── infrastructure/   # Infrastructure layer (external deps)
+│   ├── interfaces/       # Interface adapters
+│   ├── presentation/     # View models
+│   └── ui/              # TUI components (tview adapters)
+└── Makefile
+```
 
-### Universal Design Improvements
-- **WCAG 2.1 compliant** - All text meets AA contrast ratios (4.5:1+)
-- **Visual Status Indicators**: Icons (✓/✗/⏳) complement colors for color-blind accessibility
-- **Focus Indicators**: Bright blue borders show which pane has focus
-- **Titled Panes**: Each panel clearly labeled ( Packages / Tests / History / Log )
-- **Status Bar**: Context-sensitive key bindings always visible
-- **Multiple Input Methods**: Arrow keys and PageUp/PageDown alongside vim-style navigation
+## Contributing
 
-### Terminal Compatibility
-- ✅ macOS Terminal.app
-- ✅ iTerm2
-- ✅ Warp
-- ✅ Alacritty
-- ✅ kitty
-- ⚠️ Requires interactive TTY (won't work in CI/CD without TTY)
+Contributions are welcome! Please follow these guidelines:
 
-### Keyboard Shortcuts
+### Development Workflow
 
-**Navigation:**
-- `↑↓` or `j/k` - Move up/down
-- `←→` or `h/l` - Move left/right (between panes)
-- `gg` or `PageUp` - Jump to top
-- `G` or `PageDown` - Jump to bottom
-- `Tab` / `Shift-Tab` - Switch focus between panes
+1. **Fork and clone** the repository
+2. **Create a feature branch**: `git checkout -b feat/your-feature`
+3. **Follow TDD**: Write failing test → Implement → Refactor
+4. **Keep PRs small**: Aim for ≤20 lines per PR when possible
+5. **Run checks**: `make all` before committing
+6. **Commit with semantic messages**:
+   ```bash
+   feat: add new feature
+   fix: resolve bug
+   docs: update documentation
+   refactor: improve code structure
+   test: add test coverage
+   ```
 
-**Actions:**
-- `Enter` - Run selected test
-- `r` - Rerun last test
-- `/` - Open filter dialog
-- `?` - Show help
-- `q` or `Esc` - Quit
+### Code Style
 
-**Visual Feedback:**
-- Focused pane shows bright blue border
-- Test results show icons: ✓ (pass), ✗ (fail), ⏳ (running)
-- Status bar displays context-sensitive key bindings
+- Follow standard Go conventions (`gofmt`, `golangci-lint`)
+- Use build tag `//go:build tview` for TUI-specific code
+- Add comments only for "why not" explanations
+- Write self-documenting variable and function names
 
-## Usage
-1. Run `./scripts/check.sh` (defaults to PROFILE=unit).
-   - `PROFILE=race` adds `-race`, `PROFILE=cover` adds `-cover`, `PROFILE=short` adds `-short`, `RUN=TestName` adds `-run ^TestName$`.
-2. Start the TUI: `make run` or `./bin/lazygotest`
-3. Use keyboard shortcuts above to navigate and run tests.
+### Testing
 
-## Development
-- Follow TDD: add a failing test, implement the minimum, then refactor.
-- Keep PRs small (≤20 lines) and avoid `git add .`; stage files explicitly.
-- No external network required once module cache is prepared.
+- All new features must include tests
+- Maintain or improve test coverage
+- Use table-driven tests where appropriate
+- Test file naming: `*_test.go`
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Inspired by [lazygit](https://github.com/jesseduffield/lazygit) by Jesse Duffield
+- Built with [tview](https://github.com/rivo/tview) by Trevor Hilton
+- Color scheme from [Catppuccin](https://github.com/catppuccin/catppuccin)
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/YuminosukeSato/lazygotest/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/YuminosukeSato/lazygotest/discussions)
+
+---
+
+Made with ❤️ for the Go community
