@@ -42,6 +42,26 @@ func TestRunDuration(t *testing.T) {
 	}
 }
 
+func TestFormattedDuration(t *testing.T) {
+	t.Parallel()
+	run := execution.NewRun("pkg", "TestFoo")
+	if run.FormattedDuration() != "0ms" {
+		t.Fatalf("expected 0ms")
+	}
+	run.AddDuration(0.05)
+	if run.FormattedDuration() != "50ms" {
+		t.Fatalf("expected 50ms, got %s", run.FormattedDuration())
+	}
+	run.AddDuration(0.25)
+	if run.FormattedDuration() != "0.3s" {
+		t.Fatalf("expected 0.3s, got %s", run.FormattedDuration())
+	}
+	run.AddDuration(1.2)
+	if run.FormattedDuration() != "1.50s" {
+		t.Fatalf("expected 1.50s, got %s", run.FormattedDuration())
+	}
+}
+
 func assertErr(msg string) error {
 	return &testError{msg: msg}
 }

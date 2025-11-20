@@ -4,7 +4,8 @@ package main
 
 import (
 	"context"
-	"log"
+	"testing"
+	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -14,7 +15,7 @@ import (
 	"github.com/s21066/lazygotest/internal/ui"
 )
 
-func main() {
+func TestTViewAppStartup(t *testing.T) {
 	app := tview.NewApplication()
 
 	tree := ui.NewTreeAdapter()
@@ -24,7 +25,6 @@ func main() {
 
 	pages := tview.NewPages()
 
-	// Wire filter/help handlers using tview modals.
 	filterUI := func(apply func(string)) {
 		inField := tview.NewInputField()
 		inField.SetLabel("Filter: ").SetDoneFunc(func(key tcell.Key) {
@@ -68,7 +68,7 @@ func main() {
 	src := process.NewGoCmdSource(".", goRunner)
 	modules, err := src.Modules(context.Background())
 	if err != nil {
-		log.Fatalf("catalog: %v", err)
+		t.Fatalf("catalog: %v", err)
 	}
 	snap, _ := catalogsync.BuildSnapshotFromModules(modules)
 
@@ -77,7 +77,6 @@ func main() {
 	uiApp := ui.NewApp(tree, list, hist, logView, appSvc, ui.WithFilterUI(filterUI), ui.WithHelpUI(helpUI))
 	uiApp.SetSnapshot(snap, nil)
 
-	// layout
 	cols := tview.NewFlex().
 		AddItem(tree, 0, 1, true).
 		AddItem(list, 0, 1, false).
@@ -110,22 +109,29 @@ func main() {
 		return ev
 	})
 
-	// Prefer real screen; if unavailable (e.g., no /dev/tty), fall back to simulation to avoid hard failure.
-	screen, err := tcell.NewScreen()
-	if err != nil {
-		log.Printf("warning: real screen unavailable (%v), falling back to simulation screen", err)
-		screen = tcell.NewSimulationScreen("")
-	}
+	screen := tcell.NewSimulationScreen("")
 	if err := screen.Init(); err != nil {
-		log.Printf("warning: screen init failed (%v), using simulation screen", err)
-		screen = tcell.NewSimulationScreen("")
-		if err := screen.Init(); err != nil {
-			log.Fatalf("initialize screen: %v", err)
-		}
+		t.Fatalf("initialize simulation screen: %v", err)
 	}
+
 	app.SetScreen(screen)
 
-	if err := app.SetRoot(pages, true).EnableMouse(true).Run(); err != nil {
-		log.Fatal(err)
+	done := make(chan error, 1)
+	go func() {
+		done <- app.SetRoot(pages, true).EnableMouse(true).Run()
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+
+	app.Stop()
+
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("app.Run failed: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		screen.Fini()
+		t.Fatal("app startup timed out")
 	}
 }

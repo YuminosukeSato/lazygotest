@@ -1,12 +1,39 @@
 # lazygotest
 
-Command-line helpers to catalog and run Go tests in a TDD-friendly way.  
+Command-line helpers to catalog and run Go tests in a TDD-friendly way.
 
 ## Features
 - Build a test catalog from `go list -json ./...` and `go test -list` without running tests.
 - Classify unit, benchmark, example, and fuzz tests based on names.
 - Stream `go test -json` output and keep structured events.
 - Offline-friendly: uses workspace caches (`GOCACHE`, `GOLANGCI_LINT_CACHE`).
+
+## Quick Start
+
+```bash
+# Build the application
+make build
+
+# Run the TUI application (requires interactive terminal)
+make run
+
+# Or run directly
+./bin/lazygotest
+```
+
+### Available Make Targets
+
+```bash
+make help        # Show all available targets
+make build       # Build the binary
+make test        # Run all tests
+make test-tview  # Run tview-specific tests
+make run         # Build and run the application
+make clean       # Remove build artifacts and cache
+make lint        # Run golangci-lint
+make fmt         # Format code
+make all         # Format, lint, test, and build
+```
 
 ## Usage
 1. Run `./scripts/check.sh` (defaults to PROFILE=unit).  

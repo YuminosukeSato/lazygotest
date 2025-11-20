@@ -117,7 +117,7 @@ func NewLogAdapter() *LogAdapter {
 }
 
 func (l *LogAdapter) Append(line string) {
-	l.Write([]byte(line))
+	_, _ = l.Write([]byte(line))
 	l.ScrollToEnd()
 }
 

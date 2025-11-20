@@ -18,6 +18,11 @@ func NewService(source Source) Service {
 	return Service{source: source}
 }
 
+// BuildSnapshotFromModules is a helper for quickly turning module inputs into Snapshot.
+func BuildSnapshotFromModules(mods []catalog.ModuleInput) (catalog.Snapshot, error) {
+	return catalog.BuildSnapshot(mods)
+}
+
 func (s Service) Sync(ctx context.Context) (catalog.Snapshot, error) {
 	modules, err := s.source.Modules(ctx)
 	if err != nil {
